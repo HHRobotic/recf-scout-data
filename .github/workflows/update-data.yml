@@ -48,14 +48,22 @@ jobs:
           RECF_TOKEN: ${{ secrets.RECF_TOKEN }}
         run: python recf_elo.py --out out --cache cache
 
+
       - name: Commit updated CSV files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add out/ratings.csv out/solo_scores.csv
+
           if git diff --cached --quiet; then
             echo "CSV data has not changed; nothing to commit."
           else
             git commit -m "Update RECF Scout CSV data"
+
+            # Synchronize with the latest remote changes
+            git pull --rebase origin "$GITHUB_REF_NAME"
+
+            # Push the updated commit
             git push
           fi
