@@ -2,7 +2,7 @@ name: Update RECF Scout CSV data
 
 on:
   schedule:
-    # Hourly at minute 17 UTC. GitHub may delay scheduled starts during busy periods.
+    # Hourly at minute 50 UTC. GitHub may delay scheduled starts during busy periods.
     - cron: "50 * * * *"
   workflow_dispatch:
 
