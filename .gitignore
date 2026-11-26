@@ -1,0 +1,4 @@
+# Persistent API/event cache is restored between GitHub Actions runs.
+cache/
+__pycache__/
+*.py[cod]
