@@ -1,25 +1,27 @@
+
 name: Update RECF Scout data
 
 on:
   schedule:
     - cron: "*/15 * * * *"
+
   workflow_dispatch:
     inputs:
       reset_cache:
-        description: "Ignore the saved API cache and refetch everything (slow; may take several runs)"
+        description: "Ignore saved API cache and refetch everything (slow; may take several runs)"
         type: boolean
         default: false
 
 permissions:
   contents: write
-  actions: write   # only used to delete old cache entries
+  actions: write
 
 concurrency:
   group: recf-scout-data-update
   cancel-in-progress: false
 
 env:
-  CACHE_VERSION: v1   # bump this to throw away the saved cache (for example if its format ever changes)
+  CACHE_VERSION: v1
   PYTHONUNBUFFERED: "1"
 
 jobs:
@@ -28,8 +30,16 @@ jobs:
     timeout-minutes: 30
 
     steps:
+      # --------------------------------------------------
+      # 1. Checkout repository
+      # --------------------------------------------------
+
       - name: Check out repository
         uses: actions/checkout@v7
+
+      # --------------------------------------------------
+      # 2. Set up Python
+      # --------------------------------------------------
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -41,8 +51,13 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install -r requirements.txt
 
-      # GitHub caches are write-once: a key that already exists is never overwritten. So every run saves under a
-      # NEW key (run id) and restores the newest older entry through the restore-keys prefix.
+      # --------------------------------------------------
+      # 3. Restore API cache
+      #
+      # Each changed cache gets a unique key.
+      # Restore prefix finds the newest compatible cache.
+      # --------------------------------------------------
+
       - name: Restore API cache
         id: cache-restore
         if: ${{ inputs.reset_cache != true }}
@@ -53,84 +68,280 @@ jobs:
           restore-keys: |
             recf-cache-${{ env.CACHE_VERSION }}-
 
+      # --------------------------------------------------
+      # 4. Record cache state before execution
+      #
+      # SHA-256 comparison is more reliable than checking
+      # file modification timestamps.
+      # --------------------------------------------------
+
+      - name: Record initial cache state
+        run: |
+          mkdir -p cache out
+
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path("cache")
+          result = {}
+
+          for path in sorted(root.rglob("*")):
+              if path.is_file():
+                  relative = str(path.relative_to(root))
+                  result[relative] = hashlib.sha256(path.read_bytes()).hexdigest()
+
+          Path(os.environ["RUNNER_TEMP"], "cache-before.json").write_text(
+              json.dumps(result, sort_keys=True)
+          )
+
+          print(f"Initial cache files: {len(result)}")
+          PY
+
+      # --------------------------------------------------
+      # 5. Remove old completion markers
+      #
+      # Prevent an incomplete run from accidentally using
+      # metadata left over from an earlier execution.
+      # --------------------------------------------------
+
+      - name: Clear previous completion metadata
+        run: |
+          rm -f out/v1/meta.json
+          rm -f out/fetch_report.json
+          rm -f out/run_status.json
+
+      # --------------------------------------------------
+      # 6. Generate data
+      # --------------------------------------------------
+
       - name: Generate CSV and JSON data
+        id: generate
         env:
           RECF_TOKEN: ${{ secrets.RECF_TOKEN }}
         run: |
-          touch "$RUNNER_TEMP/cache-marker"
           ARGS="--out out --cache cache"
           python recf_elo.py $ARGS
 
-      - name: Did the cache change?
-        id: cache-changed
-        if: ${{ !cancelled() }}
-        run: |
-          changed=false
-          if [ -d cache ] && [ -n "$(find cache -type f -newer "$RUNNER_TEMP/cache-marker" -print -quit)" ]; then
-            changed=true
-          fi
-          echo "changed=$changed" >> "$GITHUB_OUTPUT"
-          echo "restored from: '${{ steps.cache-restore.outputs.cache-matched-key }}'  changed: $changed"
-          du -sh cache 2>/dev/null || true
+      # --------------------------------------------------
+      # 7. Check whether cache changed
+      #
+      # Runs even if Python fails, allowing partial API
+      # progress to be preserved.
+      # --------------------------------------------------
 
-      # Saved before committing, so a failed push can never lose a long fetch.
+      - name: Check whether cache changed
+        id: cache-changed
+        if: ${{ always() && !cancelled() }}
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path("cache")
+          before_path = Path(os.environ["RUNNER_TEMP"], "cache-before.json")
+
+          before = json.loads(before_path.read_text()) if before_path.exists() else {}
+          after = {}
+
+          for path in sorted(root.rglob("*")):
+              if path.is_file():
+                  relative = str(path.relative_to(root))
+                  after[relative] = hashlib.sha256(path.read_bytes()).hexdigest()
+
+          changed = before != after
+
+          print(f"Initial cache files: {len(before)}")
+          print(f"Current cache files: {len(after)}")
+          print(f"Cache changed: {changed}")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"changed={'true' if changed else 'false'}\n")
+          PY
+
+      # --------------------------------------------------
+      # 8. Save updated cache
+      #
+      # Important: Runs even if data generation fails.
+      # This preserves partial progress for the next run.
+      # --------------------------------------------------
+
       - name: Save API cache
-        if: ${{ !cancelled() && steps.cache-changed.outputs.changed == 'true' }}
+        if: ${{ always() && !cancelled() && steps.cache-changed.outputs.changed == 'true' }}
         uses: actions/cache/save@v6
         with:
           path: cache/
           key: recf-cache-${{ env.CACHE_VERSION }}-${{ github.run_id }}-${{ github.run_attempt }}
 
-      - name: Check the run finished
+      # --------------------------------------------------
+      # 9. Validate generated output
+      #
+      # Uses the actual metadata structure in your ZIP.
+      # Does not depend on run_status.json.
+      # --------------------------------------------------
+
+      - name: Check whether generation completed
         id: run-status
+        if: ${{ always() && !cancelled() }}
         run: |
           python - <<'PY'
-          import json, os
+          import json
+          import os
+          import sys
+          from pathlib import Path
+
+          complete = False
+
           try:
-              s = json.load(open("out/run_status.json"))
-              ok = bool(s.get("complete"))
-              print(f"complete={ok} aborted={s.get('aborted')} pending={s.get('pending')} of {s.get('events')} events")
+              meta_path = Path("out/v1/meta.json")
+              report_path = Path("out/fetch_report.json")
+
+              if not meta_path.exists():
+                  raise RuntimeError("Missing out/v1/meta.json")
+
+              if not report_path.exists():
+                  raise RuntimeError("Missing out/fetch_report.json")
+
+              meta = json.loads(meta_path.read_text())
+              report = json.loads(report_path.read_text())
+
+              counts = meta.get("counts", {})
+              statuses = meta.get("events_by_status", {})
+              incomplete = meta.get("incomplete")
+
+              print("Generated metadata:")
+              print(json.dumps(counts, indent=2))
+              print("Event statuses:")
+              print(json.dumps(statuses, indent=2))
+
+              problems = []
+
+              if not meta.get("generatedAt"):
+                  problems.append("Missing generation timestamp")
+
+              if not isinstance(incomplete, list):
+                  problems.append("Invalid incomplete list")
+              elif incomplete:
+                  problems.append(f"{len(incomplete)} incomplete events")
+
+              if statuses.get("pending", 0) != 0:
+                  problems.append("Pending events remain")
+
+              if statuses.get("failed", 0) != 0:
+                  problems.append("Failed events remain")
+
+              if statuses.get("partial", 0) != 0:
+                  problems.append("Partial events remain")
+
+              if counts.get("events", 0) != len(report):
+                  problems.append("Event count does not match fetch report")
+
+              if counts.get("teams", 0) <= 0:
+                  problems.append("No teams generated")
+
+              if not Path("out/ratings.csv").exists():
+                  problems.append("Missing ratings.csv")
+
+              if not Path("out/solo_scores.csv").exists():
+                  problems.append("Missing solo_scores.csv")
+
+              if not Path("out/v1/teams.json").exists():
+                  problems.append("Missing teams index")
+
+              if not Path("out/v1/events.json").exists():
+                  problems.append("Missing events index")
+
+              if not Path("out/v1/solo.json").exists():
+                  problems.append("Missing solo index")
+
+              if not Path("out/v1/regions.json").exists():
+                  problems.append("Missing regions index")
+
+              if problems:
+                  print("\nGeneration is incomplete:")
+                  for problem in problems:
+                      print(f" - {problem}")
+              else:
+                  complete = True
+                  print("\nAll completion checks passed.")
+
           except Exception as e:
-              ok = False
-              print("no usable out/run_status.json:", e)
+              print(f"Generation validation failed: {e}")
+
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-              f.write(f"complete={'true' if ok else 'false'}\n")
+              f.write(f"complete={'true' if complete else 'false'}\n")
           PY
 
+      # --------------------------------------------------
+      # 10. Skip commit if incomplete
+      # --------------------------------------------------
+
       - name: Skip commit (run incomplete)
-        if: ${{ steps.run-status.outputs.complete != 'true' }}
+        if: ${{ steps.run-status.outputs.complete != 'true' || steps.generate.outcome != 'success' }}
         run: |
-          echo "::warning::Run incomplete (time budget reached or the API was failing). The cache was saved and the next run continues; nothing is committed so the site keeps the last complete data."
+          echo "::warning::Generation incomplete or failed."
+          echo "Any updated API cache has been preserved."
+          echo "The last complete website dataset will remain unchanged."
+
+      # --------------------------------------------------
+      # 11. Commit ALL generated output
+      #
+      # Includes CSV, JSON, HTML, reports, and future files.
+      # --------------------------------------------------
 
       - name: Commit updated data files
-        if: ${{ steps.run-status.outputs.complete == 'true' }}
+        if: ${{ steps.run-status.outputs.complete == 'true' && steps.generate.outcome == 'success' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- out/ratings.csv out/solo_scores.csv out/v1
+
+          git add -A -- out/
+
           if git diff --cached --quiet; then
             echo "Data has not changed; nothing to commit."
             exit 0
           fi
+
           git commit -m "Update RECF Scout data"
+
           for attempt in 1 2 3; do
             git pull --rebase --autostash origin main
+
             if git push origin main; then
               echo "Successfully pushed data updates."
               exit 0
             fi
+
             echo "Push attempt $attempt failed."
             sleep 2
           done
+
           echo "Failed to push after 3 attempts."
           exit 1
 
-      # Every changed run adds a new cache entry. Keep only the newest two so they do not crowd out other caches.
+      # --------------------------------------------------
+      # 12. Clean up old cache entries
+      #
+      # Keep newest two cache versions.
+      # --------------------------------------------------
+
       - name: Delete old cache entries
-        if: ${{ !cancelled() && steps.cache-changed.outputs.changed == 'true' }}
+        if: ${{ always() && !cancelled() && steps.cache-changed.outputs.changed == 'true' }}
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh cache list --key "recf-cache-${CACHE_VERSION}-" --sort created_at --order desc --limit 100 --json id --jq '.[2:][].id' |
-            while read -r id; do gh cache delete "$id"; done
+          gh cache list \
+            --key "recf-cache-${CACHE_VERSION}-" \
+            --sort created_at \
+            --order desc \
+            --limit 100 \
+            --json id \
+            --jq '.[2:][].id' |
+            while read -r id; do
+              [ -z "$id" ] || gh cache delete "$id"
+            done
