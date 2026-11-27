@@ -32,7 +32,8 @@ Re-running is safe: finished events/divisions are read from ./cache; only missin
 ones hit the API. A failed request is never treated as 'no matches'.
 
 Design (each point is one simple rule)
-  1. Result = win-weighted score: a win is worth >= 0.65, a shutout 1.0, tie 0.5.
+  1. Result = win-weighted score: a win is worth >= 0.65, a shutout 1.0, tie 0.5. A win never lowers a rating
+     and a loss never raises one.
   2. Alliance rating = mean of teammates; each teammate moves by its own K.
   3. K decays with experience: 40 (rookie) -> 16 (30+ matches).
   4. Surrogate ("sitting"/asterisk) appearances count like any other match (--skip-surrogates to disable).
@@ -164,6 +165,7 @@ class Client:
         self.cache_dir = cache_dir
         self.last_req = 0.0
         self.ok_streak = self.fail_streak = self.cooldowns = 0
+        self.deadline, self.aborted = None, False
         self.stats = Counter()
         self.s = requests.Session()
         self.s.headers.update({"User-Agent": "recf-elo/1.1", "Accept": "application/json"})
@@ -188,9 +190,13 @@ class Client:
         return val
 
     def cool_if_needed(self):
+        if self.deadline and time.time() > self.deadline:
+            self.aborted = True
+            raise Abort("time budget reached")
         if self.fail_streak < self.breaker:
             return
         if self.cooldowns >= self.max_cooldowns:
+            self.aborted = True
             raise Abort(f"{self.fail_streak} consecutive failures after {self.cooldowns} cool-downs")
         wait = min(self.cooldown * 2 ** self.cooldowns, 900)
         print(f"  !! {self.fail_streak} requests in a row failed (likely rate limiting). "
@@ -700,6 +706,7 @@ def load_rankings(client, eids, a):
 
 def fetch_all(a):
     client = Client(a.base, a.token, a.cache, a.delay, a.retries, a.breaker, a.cooldown, a.max_cooldowns, a.refresh)
+    client.deadline = time.time() + a.time_budget_min * 60 if a.time_budget_min else None
     if a.event_ids:
         with open(a.event_ids, encoding="utf-8-sig") as f:
             ids = [int(x) for x in re.findall(r"\d+", f.read())]
@@ -809,6 +816,7 @@ class Elo:
         self.seeds = seeds or {}
         self.teams = {}
         self.parent = {}
+        self.log = {}          # (event id, match id) -> {team: (rating before, rating after)}
 
     def team(self, key, name=""):
         t = self.teams.get(key)
@@ -843,12 +851,19 @@ class Elo:
         margin = abs(diff) / max(m["rs"] + m["bs"], 1)
         s_red = 0.5 + 0.5 * sign * (WIN_FLOOR + (1 - WIN_FLOOR) * margin)
         w = weight * (PLAYOFF_WEIGHT if m["playoff"] else 1.0)
+        before = {k: t["rating"] for t, k, _ in red + blue}
         for side, score, exp in ((red, s_red, exp_red), (blue, 1 - s_red, 1 - exp_red)):
             for t, _, sitting in side:
                 if sitting:
                     continue
-                delta = k_factor(t["n"]) * w * (score - exp)
-                t["rating"] += max(-MAX_DELTA, min(MAX_DELTA, delta))
+                delta = max(-MAX_DELTA, min(MAX_DELTA, k_factor(t["n"]) * w * (score - exp)))
+                # A win never lowers a rating and a loss never raises one. A narrow win by a heavy favourite scores
+                # below its expected result, which would otherwise cost the winners points and pay the losers.
+                if score > 0.5:
+                    delta = max(0.0, delta)
+                elif score < 0.5:
+                    delta = min(0.0, delta)
+                t["rating"] += delta
                 t["n"] += 1
                 t["events"].add(eid)
                 if score > 0.5:
@@ -860,6 +875,8 @@ class Elo:
         keys = [k for _, k, _ in red + blue]
         for k in keys[1:]:
             self._union(keys[0], k)
+        if m.get("id") is not None:
+            self.log[(eid, m["id"])] = {k: (before[k], t["rating"]) for t, k, _ in red + blue}
 
     def run(self, events):
         for ev, m in iter_matches(events):
@@ -1181,7 +1198,7 @@ def write_outputs(rows, out_dir):
 
 # ----------------------------- history + JSON publishing ------------------
 SCHEMA_VERSION = 1
-METHOD_VERSION = "2026.11.2"          # bump whenever a rating / value constant changes
+METHOD_VERSION = "2026.11.3"          # bump whenever a rating / value constant changes
 TEST_EVENT_PATTERN = re.compile(r"\b(test|tests|testing|demo|sandbox)\b", re.I)
 LIVE_HOURS_AFTER_END = 36
 TEAM_FIELDS = ["team", "name", "organization", "region", "grade", "value", "value_elo", "value_ts", "value_ccwm",
@@ -1272,7 +1289,8 @@ def build_team_matches(world):
                         "color": color, "partners": [x["code"] for x in side["teams"] if x["code"] != tm["code"]],
                         "opponents": [x["code"] for x in opp["teams"]],
                         "score_for": sf if scored else None, "score_against": sa if scored else None,
-                        "result": res, "sitting": tm["sitting"]})
+                        "result": res, "sitting": tm["sitting"], "elo_before": tm.get("elo_before"),
+                        "elo_after": tm.get("elo_after"), "elo_delta": tm.get("elo_delta")})
     for lst in out.values():
         lst.sort(key=lambda x: (x["scheduled"] or "", str(x["event_id"]), x["round"] or 0, x["matchnum"]))
     return out
@@ -1303,22 +1321,68 @@ def event_record(client, eid, report, world):
             "is_test": is_test_event(name), "updated_at": iso_utc(max(stamps)) if stamps else None}, ev
 
 
-def write_json(path, obj):
+VOLATILE_KEYS = {"generatedAt", "runId", "runSeconds", "updated_at", "last_event_list_at"}
+
+
+def _stable(o):
+    """The same data without the timestamps that change on every run."""
+    if isinstance(o, dict):
+        return {k: _stable(v) for k, v in o.items() if k not in VOLATILE_KEYS}
+    if isinstance(o, list):
+        return [_stable(x) for x in o]
+    return o
+
+
+def write_json(path, obj, force=False):
+    """Write atomically. A file whose content is unchanged (timestamps ignored) is left alone, so a quiet hour
+    produces no file changes at all (and nothing to commit). -> True if the file was written."""
+    if not force and os.path.exists(path):
+        try:
+            with open(path, encoding="utf-8") as f:
+                if _stable(json.load(f)) == _stable(obj):
+                    return False
+        except (OSError, ValueError):
+            pass
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
     os.replace(tmp, path)          # atomic: a crash never leaves a half-written file
+    return True
 
 
-def publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev, history, t_start):
+def with_elo(eid, jms, elo_log):
+    """Add elo_before / elo_after / elo_delta to every team of every rated match (null when the match is not rated)."""
+    out = []
+    for m in jms:
+        lg = (elo_log or {}).get((eid, m["id"]))
+        m2 = dict(m)
+        for color in ("red", "blue"):
+            teams = []
+            for x in m[color]["teams"]:
+                e = lg.get(x["code"]) if lg else None
+                teams.append({**x, "elo_before": round(e[0], 1) if e else None, "elo_after": round(e[1], 1) if e else None,
+                              "elo_delta": round(e[1] - e[0], 1) if e else None})
+            m2[color] = {**m[color], "teams": teams}
+        out.append(m2)
+    return out
+
+
+def publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev, history, t_start, elo_log=None):
     """Write the v1 JSON files (meta, teams, solo, events, regions, events/{id}, teams/{code})."""
     out = a.json_out or os.path.join(a.out, "v1")
     now = iso_utc()
+    written = [0]
+
+    def wj(path, obj, force=False):
+        if write_json(path, obj, force):
+            written[0] += 1
 
     def wrap(**kw):
         return {"schemaVersion": SCHEMA_VERSION, "generatedAt": now, **kw}
 
+    for eid in list(world["event_matches"]):
+        world["event_matches"][eid] = with_elo(eid, world["event_matches"][eid], elo_log)
     tmatches = build_team_matches(world)
     by_event, meta = world["by_event"], world["meta"]
 
@@ -1362,10 +1426,10 @@ def publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev, histo
                         "avg_value": round(sum(d["value"] for d in ranked) / len(ranked), 1) if ranked else None,
                         "top_teams": [d["team"] for d in top]})
 
-    write_json(os.path.join(out, "teams.json"), wrap(teams=teams))
-    write_json(os.path.join(out, "solo.json"), wrap(solo=solo))
-    write_json(os.path.join(out, "events.json"), wrap(events=ev_list))
-    write_json(os.path.join(out, "regions.json"), wrap(regions=regions))
+    wj(os.path.join(out, "teams.json"), wrap(teams=teams))
+    wj(os.path.join(out, "solo.json"), wrap(solo=solo))
+    wj(os.path.join(out, "events.json"), wrap(events=ev_list))
+    wj(os.path.join(out, "regions.json"), wrap(regions=regions))
 
     # ---- events/{id}.json
     n_events = 0
@@ -1385,7 +1449,7 @@ def publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev, histo
         stats = [{"team": k, "matches": cnt, "ccwm": round(o - d, 2), "opr": round(o, 2), "dpr": round(d, 2)}
                  for k, (o, d, cnt) in sorted((ccwm_ev.get(eid) or {}).items())]
         head = {k: v for k, v in rec.items() if k not in ("matches", "teams")}   # counts live in events.json
-        write_json(os.path.join(out, "events", f"{eid}.json"), wrap(
+        wj(os.path.join(out, "events", f"{eid}.json"), wrap(
             **head, scored_matches=rec["matches"], team_count=rec["teams"], divisions=[{"id": d["id"], "name": d.get("name")} for d in ev_raw[eid].get("divisions") or []],
             matches=jm,
             solo=sorted(({"team": k, "name": v["name"], "driver": v["driver"], "programming": v["programming"],
@@ -1418,14 +1482,14 @@ def publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev, histo
         ev_rows.sort(key=lambda x: (x["start"] or "", str(x["event_id"])))
         safe = re.sub(r"[^A-Za-z0-9._-]", "_", code)
         head = {k: v for k, v in d.items() if k not in ("events", "matches")}   # counts live in teams.json
-        write_json(os.path.join(out, "teams", f"{safe}.json"),
+        wj(os.path.join(out, "teams", f"{safe}.json"),
                    wrap(**head, event_count=d["events"], match_count=d["matches"], events=ev_rows,
                         matches=tmatches.get(code, []), history=history.get(code, [])))
 
     # ---- meta.json (written last: it is the "everything above is in place" marker)
     status = Counter(r["status"] for r in report.values())
     bad = [(e, r) for e, r in report.items() if r["status"] in ("failed", "partial", "pending")]
-    write_json(os.path.join(out, "meta.json"), wrap(
+    wj(os.path.join(out, "meta.json"), wrap(
         methodVersion=METHOD_VERSION, runId=os.environ.get("GITHUB_RUN_ID") or now,
         runSeconds=round(time.time() - t_start, 1),
         counts={"teams": len(teams), "ranked_teams": sum(1 for d in teams if d["ranked"]), "events": len(ev_list),
@@ -1442,8 +1506,8 @@ def publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev, histo
                               "ccwm": [CCWM_CENTER, CCWM_SCALE], "solo": [SOLO_CENTER, SOLO_SCALE]},
                    "min_matches_ranked": a.min_matches, "include_playoffs": a.include_playoffs,
                    "skills_seed": a.skills_seed},
-        source={"api": "degraded" if bad else "ok", "last_event_list_at": None if a.event_ids else now}))
-    return out, len(teams), n_events, len(ev_list)
+        source={"api": "degraded" if bad else "ok", "last_event_list_at": None if a.event_ids else now}), force=a.heartbeat)
+    return out, len(teams), n_events, len(ev_list), written[0]
 
 
 # ----------------------------- synthetic demo -----------------------------
@@ -1579,6 +1643,11 @@ def main():
                     help="treat these regions as one combined region (repeatable). Built in: New Hampshire / Vermont")
     ap.add_argument("--json-out", help="folder for the JSON files (default: <out>/v1)")
     ap.add_argument("--no-json", action="store_true", help="write only the CSV files")
+    ap.add_argument("--time-budget-min", type=float, default=0,
+                    help="stop fetching after this many minutes (progress stays cached, run_status.json says "
+                         "complete=false); 0 = no limit")
+    ap.add_argument("--heartbeat", action="store_true",
+                    help="always rewrite v1/meta.json (fresh generatedAt) even if nothing else changed")
     ap.add_argument("--upcoming-days", type=float, default=30,
                     help="fetch registered teams for future events starting within this many days")
     ap.add_argument("--demo", action="store_true", help="synthetic data, no network")
@@ -1598,6 +1667,10 @@ def main():
     os.makedirs(a.out, exist_ok=True)
     with open(os.path.join(a.out, "fetch_report.json"), "w", encoding="utf-8") as f:
         json.dump(report, f, indent=1)
+    pending = sum(1 for r in report.values() if r["status"] == "pending")
+    with open(os.path.join(a.out, "run_status.json"), "w", encoding="utf-8") as f:
+        json.dump({"complete": not client.aborted and pending == 0, "aborted": client.aborted, "pending": pending,
+                   "events": len(report), "finished_at": iso_utc()}, f)
     print_fetch_summary(report, client)
     ws_rows = build_solo_scores(world["by_event"], world["info"], world["meta"])
     ws_path = write_solo_scores(ws_rows, a.out)
@@ -1618,10 +1691,11 @@ def main():
     path = write_outputs(rows, a.out)
     if not a.no_json:
         history = build_history(events, seeds, world["by_event"], world["info"], ccwm_ev)
-        jdir, n_teams, n_ev_files, n_events = publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev,
-                                                            history, t_start)
+        jdir, n_teams, n_ev_files, n_events, n_written = publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev,
+                                                            history, t_start, elo.log)
         print(f"JSON: {jdir}  (meta, teams, solo, events, regions + {n_ev_files} event files + {n_teams} team files; "
-              f"{n_events} events listed, rankings {'loaded' if world['rankings_ok'] else 'unavailable'})\n")
+              f"{n_events} events listed, rankings {'loaded' if world['rankings_ok'] else 'unavailable'}); "
+              f"{n_written} files changed\n")
     incomplete = sum(1 for r in report.values() if r["status"] in ("failed", "partial", "pending"))
     if incomplete:
         print(f"WARNING: ratings use {len(events)} events; {incomplete} more are incomplete. Re-run to include them.\n")
