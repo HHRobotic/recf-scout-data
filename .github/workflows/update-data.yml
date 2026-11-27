@@ -1,17 +1,26 @@
-
-name: Update RECF Scout CSV data
+name: Update RECF Scout data
 
 on:
   schedule:
     - cron: "15 * * * *"
   workflow_dispatch:
+    inputs:
+      reset_cache:
+        description: "Ignore the saved API cache and refetch everything (slow; may take several runs)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
+  actions: write   # only used to delete old cache entries
 
 concurrency:
   group: recf-scout-data-update
   cancel-in-progress: false
+
+env:
+  CACHE_VERSION: v1   # bump this to throw away the saved cache (for example if its format ever changes)
+  PYTHONUNBUFFERED: "1"
 
 jobs:
   update-data:
@@ -32,45 +41,100 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install -r requirements.txt
 
-      - name: Restore backend data cache
-        uses: actions/cache@v6
+      # GitHub caches are write-once: a key that already exists is never overwritten. So every run saves under a
+      # NEW key (run id) and restores the newest older entry through the restore-keys prefix.
+      - name: Restore API cache
+        id: cache-restore
+        if: ${{ inputs.reset_cache != true }}
+        uses: actions/cache/restore@v6
         with:
           path: cache/
-          key: recf-data-cache-${{ runner.os }}-${{ hashFiles('recf_elo.py') }}
+          key: recf-cache-${{ env.CACHE_VERSION }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
-            recf-data-cache-${{ runner.os }}-${{ hashFiles('recf_elo.py') }}-
+            recf-cache-${{ env.CACHE_VERSION }}-
 
-      - name: Generate CSV files
+      - name: Generate CSV and JSON data
         env:
           RECF_TOKEN: ${{ secrets.RECF_TOKEN }}
-        run: python recf_elo.py --out out --cache cache
+        run: |
+          touch "$RUNNER_TEMP/cache-marker"
+          # Stop fetching after 22 minutes so the cache still gets saved and the job is never killed by the
+          # 30-minute limit. The first (cold) run may need several runs to finish; each one continues the last.
+          ARGS="--out out --cache cache --time-budget-min 22"
+          # Once a day (12:15 UTC) refresh v1/meta.json even if nothing changed, so there is always a recent commit.
+          if [ "$(date -u +%H)" = "12" ]; then ARGS="$ARGS --heartbeat"; fi
+          python recf_elo.py $ARGS
 
+      - name: Did the cache change?
+        id: cache-changed
+        if: ${{ !cancelled() }}
+        run: |
+          changed=false
+          if [ -d cache ] && [ -n "$(find cache -type f -newer "$RUNNER_TEMP/cache-marker" -print -quit)" ]; then
+            changed=true
+          fi
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+          echo "restored from: '${{ steps.cache-restore.outputs.cache-matched-key }}'  changed: $changed"
+          du -sh cache 2>/dev/null || true
 
-      - name: Commit updated CSV files
+      # Saved before committing, so a failed push can never lose a long fetch.
+      - name: Save API cache
+        if: ${{ !cancelled() && steps.cache-changed.outputs.changed == 'true' }}
+        uses: actions/cache/save@v6
+        with:
+          path: cache/
+          key: recf-cache-${{ env.CACHE_VERSION }}-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Check the run finished
+        id: run-status
+        run: |
+          python - <<'PY'
+          import json, os
+          try:
+              s = json.load(open("out/run_status.json"))
+              ok = bool(s.get("complete"))
+              print(f"complete={ok} aborted={s.get('aborted')} pending={s.get('pending')} of {s.get('events')} events")
+          except Exception as e:
+              ok = False
+              print("no usable out/run_status.json:", e)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"complete={'true' if ok else 'false'}\n")
+          PY
+
+      - name: Skip commit (run incomplete)
+        if: ${{ steps.run-status.outputs.complete != 'true' }}
+        run: |
+          echo "::warning::Run incomplete (time budget reached or the API was failing). The cache was saved and the next run continues; nothing is committed so the site keeps the last complete data."
+
+      - name: Commit updated data files
+        if: ${{ steps.run-status.outputs.complete == 'true' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add out/ratings.csv out/solo_scores.csv
-
+          git add -A -- out/ratings.csv out/solo_scores.csv out/v1
           if git diff --cached --quiet; then
-            echo "CSV data has not changed; nothing to commit."
+            echo "Data has not changed; nothing to commit."
             exit 0
           fi
-
-          git commit -m "Update RECF Scout CSV data"
-
+          git commit -m "Update RECF Scout data"
           for attempt in 1 2 3; do
-            git pull --rebase origin main
-
+            git pull --rebase --autostash origin main
             if git push origin main; then
-              echo "Successfully pushed CSV updates."
+              echo "Successfully pushed data updates."
               exit 0
             fi
-
             echo "Push attempt $attempt failed."
             sleep 2
           done
-
           echo "Failed to push after 3 attempts."
           exit 1
+
+      # Every changed run adds a new cache entry. Keep only the newest two so they do not crowd out other caches.
+      - name: Delete old cache entries
+        if: ${{ !cancelled() && steps.cache-changed.outputs.changed == 'true' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh cache list --key "recf-cache-${CACHE_VERSION}-" --sort created_at --order desc --limit 100 --json id --jq '.[2:][].id' |
+            while read -r id; do gh cache delete "$id"; done
