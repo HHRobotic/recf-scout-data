@@ -2,7 +2,7 @@ name: Update RECF Scout data
 
 on:
   schedule:
-    - cron: "3,18,33,48 * * * *"
+    - cron: "13,28,43,58 * * * *"
 
   workflow_dispatch:
     inputs:
