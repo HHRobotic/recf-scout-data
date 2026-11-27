@@ -1,0 +1,2774 @@
+{
+ "800": {
+  "status": "empty",
+  "name": "Diana's Test event",
+  "matches": 0,
+  "detail": ""
+ },
+ "858": {
+  "status": "empty",
+  "name": "Test",
+  "matches": 0,
+  "detail": ""
+ },
+ "899": {
+  "status": "empty",
+  "name": "2027 Southern California RECF Achieve Regional Championship - High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "1103": {
+  "status": "empty",
+  "name": "Havoc on The Hill",
+  "matches": 0,
+  "detail": ""
+ },
+ "1209": {
+  "status": "empty",
+  "name": "2027 Southern California RECF Achieve Regional Championship - Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "34": {
+  "status": "empty",
+  "name": "Rebel Rumble",
+  "matches": 0,
+  "detail": ""
+ },
+ "44": {
+  "status": "empty",
+  "name": "Demo Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "121": {
+  "status": "empty",
+  "name": "Summit",
+  "matches": 0,
+  "detail": ""
+ },
+ "134": {
+  "status": "empty",
+  "name": "Eastern Utah VRC",
+  "matches": 0,
+  "detail": ""
+ },
+ "163": {
+  "status": "empty",
+  "name": "",
+  "matches": 0,
+  "detail": ""
+ },
+ "73": {
+  "status": "ok",
+  "name": "Pinnacle Season Opener at KU",
+  "matches": 32,
+  "detail": ""
+ },
+ "290": {
+  "status": "empty",
+  "name": "Texas demo Horizon West Robotics Pinnacle Challenge (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "308": {
+  "status": "empty",
+  "name": "demo M-I Warrior Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "273": {
+  "status": "empty",
+  "name": "Michigan Event Partner and Coaches Summit",
+  "matches": 0,
+  "detail": ""
+ },
+ "171": {
+  "status": "empty",
+  "name": "MCS Robotics Annual Volunteer Bootcamp 9.10.26",
+  "matches": 0,
+  "detail": ""
+ },
+ "35": {
+  "status": "empty",
+  "name": "Massachusetts Coach/EP/Volunteer Workshop",
+  "matches": 0,
+  "detail": ""
+ },
+ "173": {
+  "status": "empty",
+  "name": "MCS Robotics Annual Volunteer Bootcamp 9.12.26",
+  "matches": 0,
+  "detail": ""
+ },
+ "236": {
+  "status": "empty",
+  "name": "San Joaquin Delta Invitational Robotics League AM",
+  "matches": 0,
+  "detail": ""
+ },
+ "237": {
+  "status": "empty",
+  "name": "San Joaquin Delta Invitational Robotics League PM",
+  "matches": 0,
+  "detail": ""
+ },
+ "70": {
+  "status": "empty",
+  "name": "Texas RECF Achieve Competition Early Starter STAR Showoff",
+  "matches": 0,
+  "detail": ""
+ },
+ "483": {
+  "status": "empty",
+  "name": "Texas USTEM Fall Show down",
+  "matches": 0,
+  "detail": ""
+ },
+ "603": {
+  "status": "empty",
+  "name": "RECF Achieve 2026-2027 Hanoi Scrimmage",
+  "matches": 0,
+  "detail": ""
+ },
+ "642": {
+  "status": "empty",
+  "name": "Space City Achieve HS League Invitational",
+  "matches": 0,
+  "detail": ""
+ },
+ "41": {
+  "status": "empty",
+  "name": "Pinnacle Workshop",
+  "matches": 0,
+  "detail": ""
+ },
+ "253": {
+  "status": "empty",
+  "name": "Horizon West Robotics Pinnacle Challenge (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "458": {
+  "status": "empty",
+  "name": "SIMC-PG EMBODIED INTELLIGENCE GREATER BAY AREA",
+  "matches": 0,
+  "detail": ""
+ },
+ "661": {
+  "status": "empty",
+  "name": "Gearing Up at R5: Achieve Scrimmage",
+  "matches": 0,
+  "detail": ""
+ },
+ "643": {
+  "status": "empty",
+  "name": "Space City Achieve MS League Invitational",
+  "matches": 0,
+  "detail": ""
+ },
+ "227": {
+  "status": "empty",
+  "name": "James Ruse Achieve Tournament (Middle/High School)",
+  "matches": 0,
+  "detail": ""
+ },
+ "313": {
+  "status": "empty",
+  "name": "RECF-Archieve \u9ad8\u77bb\u8fdc\u77a9\u673a\u5668\u4eba\u7ade\u8d5b\u534e\u4e1c\u8d5b",
+  "matches": 0,
+  "detail": ""
+ },
+ "544": {
+  "status": "ok",
+  "name": "2026 Omaha North Fall Robotics League",
+  "matches": 12,
+  "detail": ""
+ },
+ "664": {
+  "status": "ok",
+  "name": "Region 5 Achieve Robotics League: Pinnacle",
+  "matches": 16,
+  "detail": ""
+ },
+ "414": {
+  "status": "ok",
+  "name": "Best in SWFL - HS only",
+  "matches": 26,
+  "detail": ""
+ },
+ "750": {
+  "status": "empty",
+  "name": "RECF Achieve 2026-2027 Scrimmage Hanoi",
+  "matches": 0,
+  "detail": ""
+ },
+ "433": {
+  "status": "ok",
+  "name": "GEC Future Cup Xi'an Qualifier",
+  "matches": 48,
+  "detail": ""
+ },
+ "50": {
+  "status": "empty",
+  "name": "RECF Solo Remote Matches - Robotics Tournament (Oct. 7)",
+  "matches": 0,
+  "detail": ""
+ },
+ "399": {
+  "status": "empty",
+  "name": "TX- RECF Achieve Bridgeland HS Fall Solo Match ",
+  "matches": 0,
+  "detail": ""
+ },
+ "49": {
+  "status": "ok",
+  "name": "MO - Unitec RECF Missouri Opener",
+  "matches": 24,
+  "detail": ""
+ },
+ "83": {
+  "status": "empty",
+  "name": "West Oahu #1",
+  "matches": 0,
+  "detail": ""
+ },
+ "235": {
+  "status": "empty",
+  "name": "Pinnacle Workshop",
+  "matches": 0,
+  "detail": ""
+ },
+ "285": {
+  "status": "empty",
+  "name": "EngiQualifier 1 - Pinnacle Blended",
+  "matches": 0,
+  "detail": ""
+ },
+ "484": {
+  "status": "ok",
+  "name": "Texax USTEM - STEM Fest",
+  "matches": 28,
+  "detail": ""
+ },
+ "601": {
+  "status": "empty",
+  "name": "SIMC-PG EMBODIED INTELLIGENCE EASTEN CHINA",
+  "matches": 0,
+  "detail": ""
+ },
+ "589": {
+  "status": "ok",
+  "name": "Pinnacle at ROBOTICON",
+  "matches": 28,
+  "detail": ""
+ },
+ "254": {
+  "status": "empty",
+  "name": "Australia Solo Remote Matches ACHIEVE (Non-Sydney)",
+  "matches": 0,
+  "detail": ""
+ },
+ "481": {
+  "status": "empty",
+  "name": "SIMC-PG EMBODIED INTELLIGENCE CHUANYU",
+  "matches": 0,
+  "detail": ""
+ },
+ "37": {
+  "status": "ok",
+  "name": "SC - Mann Achieve Season Opener",
+  "matches": 106,
+  "detail": ""
+ },
+ "78": {
+  "status": "ok",
+  "name": "MO - Troy Achieve Spooktacular",
+  "matches": 24,
+  "detail": ""
+ },
+ "590": {
+  "status": "ok",
+  "name": "Texas | Katy Botober RECF Achieve Robotics Competition",
+  "matches": 47,
+  "detail": ""
+ },
+ "912": {
+  "status": "empty",
+  "name": "SIMC-PG EMBODIED INTELLIGENCE BEIJING",
+  "matches": 0,
+  "detail": ""
+ },
+ "924": {
+  "status": "empty",
+  "name": "SIMC-PG EMBODIED INTELLIGENCE HEBEI",
+  "matches": 0,
+  "detail": ""
+ },
+ "726": {
+  "status": "ok",
+  "name": "Farm Fresh Invitational Achieve/Pinnacle Blended League",
+  "matches": 29,
+  "detail": ""
+ },
+ "176": {
+  "status": "empty",
+  "name": "RECF Solo Remote Matches - Robotics Tournament (Oct. 20)",
+  "matches": 0,
+  "detail": ""
+ },
+ "396": {
+  "status": "ok",
+  "name": "Barron County Acheive Robotics League",
+  "matches": 15,
+  "detail": ""
+ },
+ "474": {
+  "status": "ok",
+  "name": "Welcome to the Superstition League RECF Robotics League!",
+  "matches": 11,
+  "detail": ""
+ },
+ "549": {
+  "status": "ok",
+  "name": "KCS RECF Achieve Qualifier",
+  "matches": 55,
+  "detail": ""
+ },
+ "36": {
+  "status": "ok",
+  "name": "SC - Falcons Frightening Competition",
+  "matches": 70,
+  "detail": ""
+ },
+ "545": {
+  "status": "ok",
+  "name": "KCS RECF Achieve Qualifier",
+  "matches": 50,
+  "detail": ""
+ },
+ "42": {
+  "status": "empty",
+  "name": "Pinnacle Workshop",
+  "matches": 0,
+  "detail": ""
+ },
+ "118": {
+  "status": "ok",
+  "name": "King Science & Technology Middle School",
+  "matches": 46,
+  "detail": ""
+ },
+ "143": {
+  "status": "ok",
+  "name": "Jackson Prep Pinnacle Achieve Opener - school based",
+  "matches": 7,
+  "detail": ""
+ },
+ "180": {
+  "status": "ok",
+  "name": "Texas Halloween Madness RECF Achieve Robotics Competition ",
+  "matches": 77,
+  "detail": ""
+ },
+ "286": {
+  "status": "ok",
+  "name": "EngiQualifier 2 - Pinnacle Blended",
+  "matches": 15,
+  "detail": ""
+ },
+ "328": {
+  "status": "empty",
+  "name": "MARG River Region Pinnacle Middle/High School Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "415": {
+  "status": "empty",
+  "name": "Erie High Fall Robotics Classic",
+  "matches": 0,
+  "detail": ""
+ },
+ "419": {
+  "status": "ok",
+  "name": "CTEEA CREC Comp Sci  HS Qualifier",
+  "matches": 48,
+  "detail": ""
+ },
+ "531": {
+  "status": "empty",
+  "name": "Maui High RECF Achieve 2026 Valley Isle Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "700": {
+  "status": "empty",
+  "name": "Broward County JROTC Sentinels Robotics Workshop ",
+  "matches": 0,
+  "detail": ""
+ },
+ "420": {
+  "status": "ok",
+  "name": "CTEEA CREC Comp Sci Blended Qualifier",
+  "matches": 38,
+  "detail": ""
+ },
+ "610": {
+  "status": "empty",
+  "name": "RECF Vietnam Remote Qualifying Event - Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "863": {
+  "status": "ok",
+  "name": "Robotics League at Mashpee Middle High School",
+  "matches": 24,
+  "detail": ""
+ },
+ "193": {
+  "status": "ok",
+  "name": "MCS ACHIEVE High School GHS 10.29.26--OPEN",
+  "matches": 35,
+  "detail": ""
+ },
+ "194": {
+  "status": "ok",
+  "name": "MCS ACHIEVE Middle School GHS 10.30.26--OPEN",
+  "matches": 49,
+  "detail": ""
+ },
+ "117": {
+  "status": "empty",
+  "name": "CA 2026 Centennial roBOOtics SPOOKtacular - CANCELLED ",
+  "matches": 0,
+  "detail": ""
+ },
+ "217": {
+  "status": "ok",
+  "name": "MARG RECF/Pinnacle MS/HS Competition",
+  "matches": 24,
+  "detail": ""
+ },
+ "464": {
+  "status": "empty",
+  "name": "Demo Even",
+  "matches": 0,
+  "detail": ""
+ },
+ "677": {
+  "status": "ok",
+  "name": "MCC Robotics RECF ACHIEVE Season Kickoff",
+  "matches": 40,
+  "detail": ""
+ },
+ "734": {
+  "status": "ok",
+  "name": "Ghostly Games at Apopka  ",
+  "matches": 29,
+  "detail": ""
+ },
+ "1004": {
+  "status": "empty",
+  "name": "RECF Vietnam Remote Qualifying Event - Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "725": {
+  "status": "empty",
+  "name": "test league",
+  "matches": 0,
+  "detail": ""
+ },
+ "902": {
+  "status": "ok",
+  "name": "Fox Valley RECF Achieve League",
+  "matches": 9,
+  "detail": ""
+ },
+ "181": {
+  "status": "empty",
+  "name": "RECF Solo Remote Matches - Robotics Tournament (Nov.  4)",
+  "matches": 0,
+  "detail": ""
+ },
+ "698": {
+  "status": "ok",
+  "name": "GPS LEAGUE RECF",
+  "matches": 25,
+  "detail": ""
+ },
+ "556": {
+  "status": "ok",
+  "name": "Bobcat Pinnacle Blended League",
+  "matches": 17,
+  "detail": ""
+ },
+ "365": {
+  "status": "ok",
+  "name": "Warrior Robotics Achieve Tournament",
+  "matches": 72,
+  "detail": ""
+ },
+ "135": {
+  "status": "empty",
+  "name": "demo Missing info Bear River Ice Cream Social",
+  "matches": 0,
+  "detail": ""
+ },
+ "241": {
+  "status": "empty",
+  "name": "TX Innovation Showdown in Plano RECF Achieve Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "243": {
+  "status": "ok",
+  "name": "SC - Battle at the Branch 26-27 Qualifier",
+  "matches": 50,
+  "detail": ""
+ },
+ "293": {
+  "status": "ok",
+  "name": "SC - Battle at the Ridge",
+  "matches": 53,
+  "detail": ""
+ },
+ "342": {
+  "status": "ok",
+  "name": "Highland Prep Robotics Qualifier",
+  "matches": 18,
+  "detail": ""
+ },
+ "421": {
+  "status": "ok",
+  "name": "CTEEA Ridgefield HS Blended Qualifier",
+  "matches": 87,
+  "detail": ""
+ },
+ "468": {
+  "status": "ok",
+  "name": "SC - BJA Achieve MS Tournament",
+  "matches": 53,
+  "detail": ""
+ },
+ "473": {
+  "status": "empty",
+  "name": "Circuit Clash (Skills, Engineering Notebooks and Team Interviews Only)",
+  "matches": 0,
+  "detail": ""
+ },
+ "498": {
+  "status": "ok",
+  "name": "MO - Potosi RECF Missouri Tournament",
+  "matches": 33,
+  "detail": ""
+ },
+ "506": {
+  "status": "empty",
+  "name": "Thayer Academy Achieve Workshop",
+  "matches": 0,
+  "detail": ""
+ },
+ "528": {
+  "status": "ok",
+  "name": "Robot Showdown",
+  "matches": 31,
+  "detail": ""
+ },
+ "574": {
+  "status": "ok",
+  "name": "The Lion's Pride Achieve Event",
+  "matches": 31,
+  "detail": ""
+ },
+ "592": {
+  "status": "ok",
+  "name": "Omaha South, Tom Dickey Memorial Tournament  ",
+  "matches": 68,
+  "detail": ""
+ },
+ "596": {
+  "status": "ok",
+  "name": "Phoenix Nest Pinnacle",
+  "matches": 36,
+  "detail": ""
+ },
+ "640": {
+  "status": "ok",
+  "name": "Arizona State University Polytechnic - Pinnacle Qualifier",
+  "matches": 31,
+  "detail": ""
+ },
+ "732": {
+  "status": "ok",
+  "name": "Trinity Knight Battle",
+  "matches": 58,
+  "detail": ""
+ },
+ "743": {
+  "status": "ok",
+  "name": "Thetford Academy Robotics Haunted Harvest Tournament",
+  "matches": 49,
+  "detail": ""
+ },
+ "949": {
+  "status": "ok",
+  "name": "Texas | Katy Gobbler Games ",
+  "matches": 41,
+  "detail": ""
+ },
+ "982": {
+  "status": "ok",
+  "name": "Hanks TSA Scrimmage ",
+  "matches": 12,
+  "detail": ""
+ },
+ "992": {
+  "status": "ok",
+  "name": "Battle in the Big Country",
+  "matches": 44,
+  "detail": ""
+ },
+ "381": {
+  "status": "ok",
+  "name": "Kettering University Pinnacle Tournament: Precision Pursuit",
+  "matches": 10,
+  "detail": ""
+ },
+ "256": {
+  "status": "empty",
+  "name": "Australia Solo Remote Matches ACHIEVE 2 (Non-Sydney)",
+  "matches": 0,
+  "detail": ""
+ },
+ "803": {
+  "status": "ok",
+  "name": "Texas CFISD Fall Invitational RECF Achieve Robotics Competition",
+  "matches": 58,
+  "detail": ""
+ },
+ "1066": {
+  "status": "empty",
+  "name": "RECF Vietnam Remote Qualifying Event - Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "81": {
+  "status": "ok",
+  "name": "Hawaii Searider Robotics Competition - Blended MS/HS ",
+  "matches": 7,
+  "detail": ""
+ },
+ "88": {
+  "status": "ok",
+  "name": "SC - The Clover Clash (Achieve)",
+  "matches": 56,
+  "detail": ""
+ },
+ "129": {
+  "status": "empty",
+  "name": "WV John Marshall High School Blended Achieve Pinnacle Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "204": {
+  "status": "ok",
+  "name": "MCS ACHIEVE Middle School MMS 11.14.26--SCHOOL ONLY",
+  "matches": 64,
+  "detail": ""
+ },
+ "205": {
+  "status": "ok",
+  "name": "MCS ACHIEVE High School MMS 11.14.26--SCHOOL ONLY",
+  "matches": 24,
+  "detail": ""
+ },
+ "261": {
+  "status": "empty",
+  "name": "Milton Achieve Robotics Blended Open Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "287": {
+  "status": "ok",
+  "name": "Texas RECF Achieve Robotics Competition-Fall Open",
+  "matches": 64,
+  "detail": ""
+ },
+ "294": {
+  "status": "ok",
+  "name": "Miami-Dade Make It Happen",
+  "matches": 30,
+  "detail": ""
+ },
+ "309": {
+  "status": "ok",
+  "name": "West Texas Fall Brawl",
+  "matches": 31,
+  "detail": ""
+ },
+ "348": {
+  "status": "empty",
+  "name": "Mountain Pointe High School Pinnacle State Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "567": {
+  "status": "ok",
+  "name": "Oxford Robotics blended HS/MS Fall Tournament",
+  "matches": 44,
+  "detail": ""
+ },
+ "593": {
+  "status": "ok",
+  "name": "Central High School Achieve High School",
+  "matches": 47,
+  "detail": ""
+ },
+ "594": {
+  "status": "ok",
+  "name": "Central High School Achieve  Middle School",
+  "matches": 44,
+  "detail": ""
+ },
+ "635": {
+  "status": "ok",
+  "name": "Bay Area RECF Achieve Tournament ",
+  "matches": 28,
+  "detail": ""
+ },
+ "658": {
+  "status": "ok",
+  "name": "Brooks Robo Rumble",
+  "matches": 84,
+  "detail": ""
+ },
+ "689": {
+  "status": "empty",
+  "name": "Wetzel County Achieve Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "821": {
+  "status": "empty",
+  "name": "Chargers RECF Achieve Robotics Challenge ",
+  "matches": 0,
+  "detail": ""
+ },
+ "448": {
+  "status": "ok",
+  "name": "LEEP2 the Pinnacle of Robotics",
+  "matches": 77,
+  "detail": ""
+ },
+ "1151": {
+  "status": "empty",
+  "name": "Online Challenges Cycle 2 - 3D Printing and Fabrication Award (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1154": {
+  "status": "empty",
+  "name": "Online Challenges Cycle 2 - Photography Challenge \u201cWhat does STEM mean to me?\u201d (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1159": {
+  "status": "empty",
+  "name": "Online Challenges Cycle 2 -Advertising Challenge - Fulfilling the RECF Mission and Vision (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1164": {
+  "status": "empty",
+  "name": "Online Challenges Cycle 2 - Game Introduction & Explanation Video Challenge (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1169": {
+  "status": "empty",
+  "name": "Online Challenges Cycle 2 - Robots + Drones: The Ultimate Team (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1174": {
+  "status": "empty",
+  "name": "Online Challenges Cycle 2 - STEM + Art + Trend = Team Spirit (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "184": {
+  "status": "empty",
+  "name": "RECF Solo Remote Matches - Robotics Tournament (Nov. 17)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1022": {
+  "status": "ok",
+  "name": "Cape Cod Robotics - STEM Network Collaborative",
+  "matches": 10,
+  "detail": ""
+ },
+ "859": {
+  "status": "empty",
+  "name": "Worcester Area Pinnacle League",
+  "matches": 0,
+  "detail": ""
+ },
+ "644": {
+  "status": "ok",
+  "name": "Space City Achieve MS Signature Event",
+  "matches": 119,
+  "detail": ""
+ },
+ "906": {
+  "status": "empty",
+  "name": "2026 AI-Creation Cup National AI Robotics Innovation Competition & CREATE U.S. Open Robotics Championship C.R.C. China Championship - Shanghai, China",
+  "matches": 0,
+  "detail": ""
+ },
+ "977": {
+  "status": "empty",
+  "name": "Mustang Solo Only Conference Event - Fri. Evening Session",
+  "matches": 0,
+  "detail": ""
+ },
+ "85": {
+  "status": "empty",
+  "name": "demo Missing info Daniel Hand HS CTEEA",
+  "matches": 0,
+  "detail": ""
+ },
+ "183": {
+  "status": "empty",
+  "name": "MO - Bloomfield Fall Tournament ",
+  "matches": 0,
+  "detail": ""
+ },
+ "388": {
+  "status": "ok",
+  "name": "3rd Annual Desert Ridge High School VA Sock HOP",
+  "matches": 35,
+  "detail": ""
+ },
+ "422": {
+  "status": "ok",
+  "name": "CTEEA Daniel Hand HS Blended Qualifier",
+  "matches": 89,
+  "detail": ""
+ },
+ "423": {
+  "status": "ok",
+  "name": "CTEEA Seymour HS Blended Qualifier",
+  "matches": 72,
+  "detail": ""
+ },
+ "521": {
+  "status": "ok",
+  "name": "MARG RECF/Achieve Pinnacle MS/HS Competition ",
+  "matches": 32,
+  "detail": ""
+ },
+ "572": {
+  "status": "ok",
+  "name": "North Andover High School November Pinnacle Qualifier",
+  "matches": 84,
+  "detail": ""
+ },
+ "618": {
+  "status": "ok",
+  "name": "South Dakota Tiger Nation Elevated",
+  "matches": 16,
+  "detail": ""
+ },
+ "672": {
+  "status": "ok",
+  "name": "OSCS Pinnacle Tournament",
+  "matches": 45,
+  "detail": ""
+ },
+ "681": {
+  "status": "ok",
+  "name": "Mount Washington Valley Pinnacle Tournament",
+  "matches": 36,
+  "detail": ""
+ },
+ "784": {
+  "status": "ok",
+  "name": "Rams Robotics Fall Tournament ",
+  "matches": 21,
+  "detail": ""
+ },
+ "914": {
+  "status": "ok",
+  "name": "East Oahu RECF Achieve Tournament",
+  "matches": 43,
+  "detail": ""
+ },
+ "973": {
+  "status": "empty",
+  "name": "Mustang Solo Only Conference Event - Saturday Morning Session",
+  "matches": 0,
+  "detail": ""
+ },
+ "974": {
+  "status": "ok",
+  "name": "Port Jervis Scrimmage",
+  "matches": 21,
+  "detail": ""
+ },
+ "978": {
+  "status": "empty",
+  "name": "Mustang Solo Only Conference Event - Saturday Afternoon Session",
+  "matches": 0,
+  "detail": ""
+ },
+ "1007": {
+  "status": "ok",
+  "name": "Texas | Katy Holiday Classic",
+  "matches": 31,
+  "detail": ""
+ },
+ "525": {
+  "status": "ok",
+  "name": "Pinnacle Qualifier",
+  "matches": 21,
+  "detail": ""
+ },
+ "663": {
+  "status": "ok",
+  "name": "Route 66 Robot Rally Achieve Signature Event (Middle School/High School)",
+  "matches": 52,
+  "detail": ""
+ },
+ "798": {
+  "status": "empty",
+  "name": "Belmont Hill Blended Scrimmage",
+  "matches": 0,
+  "detail": ""
+ },
+ "645": {
+  "status": "ok",
+  "name": "Space City Achieve HS Signature Event",
+  "matches": 129,
+  "detail": ""
+ },
+ "1012": {
+  "status": "empty",
+  "name": "Winters FarmBOTS League",
+  "matches": 0,
+  "detail": ""
+ },
+ "1256": {
+  "status": "empty",
+  "name": "Lunar Base Challenge 2026 \u2014 Internation AI Robotics Innovation Competition \u2014 Beijing Open",
+  "matches": 0,
+  "detail": ""
+ },
+ "64": {
+  "status": "future",
+  "name": "INC--The Inaugural Pinnacle at My School",
+  "matches": 0,
+  "detail": ""
+ },
+ "225": {
+  "status": "future",
+  "name": "NSW Scouts Achieve Tournament (Middle/High School)",
+  "matches": 0,
+  "detail": ""
+ },
+ "310": {
+  "status": "future",
+  "name": "Air Capital Showdown Middle School Signature Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "550": {
+  "status": "future",
+  "name": "KCS RECF Achieve Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "146": {
+  "status": "future",
+  "name": "Texas JROTC Drill Meet RECF Achieve Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "546": {
+  "status": "future",
+  "name": "KCS RECF Achieve Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "1114": {
+  "status": "future",
+  "name": "RECF Achieve High School Solo Matches",
+  "matches": 0,
+  "detail": ""
+ },
+ "230": {
+  "status": "future",
+  "name": "SC - B3: Bot Battle at the Bluff",
+  "matches": 0,
+  "detail": ""
+ },
+ "244": {
+  "status": "future",
+  "name": "Highland Prep West  Robotics Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "284": {
+  "status": "future",
+  "name": "RECF Achieve on the Plains",
+  "matches": 0,
+  "detail": ""
+ },
+ "323": {
+  "status": "future",
+  "name": "Merry Buc-Mas Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "355": {
+  "status": "future",
+  "name": "Trials of Valhalla",
+  "matches": 0,
+  "detail": ""
+ },
+ "375": {
+  "status": "future",
+  "name": "Jefferson County Achieve Tournament  ",
+  "matches": 0,
+  "detail": ""
+ },
+ "437": {
+  "status": "future",
+  "name": "Menasha's Annual Achieve Robotics Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "461": {
+  "status": "future",
+  "name": "Riverdale Pinnacle Challenge",
+  "matches": 0,
+  "detail": ""
+ },
+ "529": {
+  "status": "future",
+  "name": "Burkburnett Robotics Competition - Pinnacle ",
+  "matches": 0,
+  "detail": ""
+ },
+ "579": {
+  "status": "future",
+  "name": "C2C Pinnacle League",
+  "matches": 0,
+  "detail": ""
+ },
+ "647": {
+  "status": "future",
+  "name": "Norris Middle School Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "728": {
+  "status": "future",
+  "name": "West Oahu #2",
+  "matches": 0,
+  "detail": ""
+ },
+ "752": {
+  "status": "future",
+  "name": "Loften Eagle Qualifier - RECF Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "830": {
+  "status": "future",
+  "name": "WildCat GameCon 2026: Robotics",
+  "matches": 0,
+  "detail": ""
+ },
+ "897": {
+  "status": "future",
+  "name": "2026 Sahuaro RECF Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "74": {
+  "status": "future",
+  "name": "Route 1 Rumble December Conference Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "1019": {
+  "status": "future",
+  "name": "[Achieve] Korea Open Circuit (Tournament 1) ",
+  "matches": 0,
+  "detail": ""
+ },
+ "740": {
+  "status": "future",
+  "name": "Farm Fresh Open Achieve Pinnacle Blended Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "1251": {
+  "status": "future",
+  "name": "The Terkanian Cape Cod League",
+  "matches": 0,
+  "detail": ""
+ },
+ "969": {
+  "status": "future",
+  "name": "RECF Solo Remote Matches - Robotics Tournament (Dec. 8)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1208": {
+  "status": "future",
+  "name": "\"O Solo Mio\"",
+  "matches": 0,
+  "detail": ""
+ },
+ "1052": {
+  "status": "future",
+  "name": "RECF Solo Remote Matches - Robotics Tournament (December 10)",
+  "matches": 0,
+  "detail": ""
+ },
+ "300": {
+  "status": "future",
+  "name": "SC - BRMS Clash of the Bots",
+  "matches": 0,
+  "detail": ""
+ },
+ "1149": {
+  "status": "future",
+  "name": "H\u00e0 N\u1ed9i Achieve Tournament (Middle/High School)",
+  "matches": 0,
+  "detail": ""
+ },
+ "46": {
+  "status": "future",
+  "name": "SC - Mann Achieve Winter Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "82": {
+  "status": "future",
+  "name": "Oklahoma Pirate Parlay",
+  "matches": 0,
+  "detail": ""
+ },
+ "95": {
+  "status": "future",
+  "name": "Framingham December Blended MS/ HS Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "136": {
+  "status": "future",
+  "name": "ROM12 @ Purdue Polytechnic High School Qualifying Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "206": {
+  "status": "future",
+  "name": "MCS ACHIEVE Middle School MMS 12.12.26--SCHOOL ONLY",
+  "matches": 0,
+  "detail": ""
+ },
+ "207": {
+  "status": "future",
+  "name": "MCS ACHIEVE High School MMS 12.12.26--SCHOOL ONLY",
+  "matches": 0,
+  "detail": ""
+ },
+ "269": {
+  "status": "future",
+  "name": "CTEEA Masuk HS Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "382": {
+  "status": "future",
+  "name": "Kettering University Pinnacle Tournament: Frozen Faceoff",
+  "matches": 0,
+  "detail": ""
+ },
+ "390": {
+  "status": "future",
+  "name": "MARG RECF/Pinnacle MS/HS Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "397": {
+  "status": "future",
+  "name": "Onalaska RECF Pinnacle Blended Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "485": {
+  "status": "future",
+  "name": "Texas USTEM Holiday Classic",
+  "matches": 0,
+  "detail": ""
+ },
+ "492": {
+  "status": "future",
+  "name": "2026-2027 Viking HS Pinnacle",
+  "matches": 0,
+  "detail": ""
+ },
+ "535": {
+  "status": "future",
+  "name": "Conference Battle of the Bridge - HS",
+  "matches": 0,
+  "detail": ""
+ },
+ "536": {
+  "status": "future",
+  "name": "Conference Battle of the Bridge - MS",
+  "matches": 0,
+  "detail": ""
+ },
+ "559": {
+  "status": "future",
+  "name": "Phoenix Annual Winter Classic",
+  "matches": 0,
+  "detail": ""
+ },
+ "569": {
+  "status": "future",
+  "name": "RECF-Archieve \u9ad8\u77bb\u8fdc\u77a9\u673a\u5668\u4eba\u7ade\u8d5b\u6d59\u6c5f\u7701\u5927\u533a\u8d5b",
+  "matches": 0,
+  "detail": ""
+ },
+ "609": {
+  "status": "future",
+  "name": "\u5e7f\u4e1c\u7701\u4e2d\u5c0f\u5b66\u751f\u79d1\u5b66\u6559\u80b2\u521b\u65b0\u6210\u679c\u5c55\u793a\u5927\u8d5b",
+  "matches": 0,
+  "detail": ""
+ },
+ "622": {
+  "status": "future",
+  "name": "Pinnacle Knightmare @ UCF",
+  "matches": 0,
+  "detail": ""
+ },
+ "648": {
+  "status": "future",
+  "name": "Omaha North HS Achieve ",
+  "matches": 0,
+  "detail": ""
+ },
+ "649": {
+  "status": "future",
+  "name": "Omaha North MS Achieve ",
+  "matches": 0,
+  "detail": ""
+ },
+ "718": {
+  "status": "future",
+  "name": "Mount Academy 2026 RECF Achieve Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "757": {
+  "status": "future",
+  "name": "Neenah's Merry RECmas ",
+  "matches": 0,
+  "detail": ""
+ },
+ "767": {
+  "status": "future",
+  "name": "Pemibaker Robotics Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "791": {
+  "status": "future",
+  "name": "SoCal Greater LA Achieve Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "802": {
+  "status": "future",
+  "name": "Texas Deck the Bots RECF Achieve Robotics Competition ",
+  "matches": 0,
+  "detail": ""
+ },
+ "950": {
+  "status": "future",
+  "name": "Coalfield Conference Achieve Blended Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "995": {
+  "status": "future",
+  "name": "Miller Grove Ice Bots",
+  "matches": 0,
+  "detail": ""
+ },
+ "1204": {
+  "status": "future",
+  "name": "PISD RECF Achieve Middle School Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "1205": {
+  "status": "future",
+  "name": "PISD RECF Achieve High School Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "1243": {
+  "status": "future",
+  "name": "RoboSplash @ DY",
+  "matches": 0,
+  "detail": ""
+ },
+ "270": {
+  "status": "future",
+  "name": "CTEEA Masuk Blended Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "616": {
+  "status": "future",
+  "name": "Christmas at the Kingdom",
+  "matches": 0,
+  "detail": ""
+ },
+ "1053": {
+  "status": "future",
+  "name": "Canceled RECF Solo Remote Matches - Robotics Tournament (Dec 17) Canceled",
+  "matches": 0,
+  "detail": ""
+ },
+ "288": {
+  "status": "future",
+  "name": "TX-RECF Achieve-Winter Classic",
+  "matches": 0,
+  "detail": ""
+ },
+ "138": {
+  "status": "future",
+  "name": "River Valley RADs Holiday Robotics Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "231": {
+  "status": "future",
+  "name": "Pinnacle at the Coliseum",
+  "matches": 0,
+  "detail": ""
+ },
+ "272": {
+  "status": "future",
+  "name": "MO - Unitec Winter Break Send Off Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "435": {
+  "status": "future",
+  "name": "CTEEA Middletown HS Qualifier ",
+  "matches": 0,
+  "detail": ""
+ },
+ "1071": {
+  "status": "future",
+  "name": "Bengal Battle - LSU",
+  "matches": 0,
+  "detail": ""
+ },
+ "1078": {
+  "status": "future",
+  "name": "Husky Robotics Blended Pinnacle Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "1262": {
+  "status": "future",
+  "name": "RECF T\u00dcRK\u0130YE APEXION ACHIEVE",
+  "matches": 0,
+  "detail": ""
+ },
+ "459": {
+  "status": "future",
+  "name": "Signature Event: Carolina Countdown  (Achieve MS)",
+  "matches": 0,
+  "detail": ""
+ },
+ "43": {
+  "status": "future",
+  "name": "Signature Event: Carolina Countdown  (Achieve HS)",
+  "matches": 0,
+  "detail": ""
+ },
+ "959": {
+  "status": "future",
+  "name": "GEC Future Cup China National Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "1001": {
+  "status": "future",
+  "name": "GEC Future Cup China National Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "954": {
+  "status": "future",
+  "name": "2027 Winneconne Achieve Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "515": {
+  "status": "future",
+  "name": "TX- RECF Achieve Bridgeland HS Spring Solo Match",
+  "matches": 0,
+  "detail": ""
+ },
+ "551": {
+  "status": "future",
+  "name": "KCS RECF Achieve Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "1093": {
+  "status": "future",
+  "name": "RECF Solo Remote Matches - Robotics Tournament (January 7th)",
+  "matches": 0,
+  "detail": ""
+ },
+ "547": {
+  "status": "future",
+  "name": "KCS RECF Achieve Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "563": {
+  "status": "future",
+  "name": "WranglerBot 10.0",
+  "matches": 0,
+  "detail": ""
+ },
+ "573": {
+  "status": "future",
+  "name": "Southwest Oklahoma Robotics Classic",
+  "matches": 0,
+  "detail": ""
+ },
+ "701": {
+  "status": "future",
+  "name": "Broward County JROTC Golden Tornadoes Tournament - New Date",
+  "matches": 0,
+  "detail": ""
+ },
+ "1010": {
+  "status": "future",
+  "name": "White Mountain Southwest Native American Showcase",
+  "matches": 0,
+  "detail": ""
+ },
+ "233": {
+  "status": "future",
+  "name": "SC - Wildcats Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "260": {
+  "status": "future",
+  "name": "St. Mary Catholic High School Annual Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "268": {
+  "status": "future",
+  "name": "Madison Highland Prep Robotics Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "299": {
+  "status": "future",
+  "name": "Canada Mi3L School Open Achieve Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "358": {
+  "status": "future",
+  "name": "MO - Parkway West High School Achieve Blended Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "562": {
+  "status": "future",
+  "name": "R4Creating Achieve Southwest Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "617": {
+  "status": "future",
+  "name": "The 2027 Bow Bot Bout",
+  "matches": 0,
+  "detail": ""
+ },
+ "650": {
+  "status": "future",
+  "name": "ULTIMATE WARRIOR ROBOTICS COMPETITION",
+  "matches": 0,
+  "detail": ""
+ },
+ "665": {
+  "status": "future",
+  "name": "2027 WVU Mountaineer Achieve Competition - High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "680": {
+  "status": "future",
+  "name": "SC - Knights' Medieval Mayhem",
+  "matches": 0,
+  "detail": ""
+ },
+ "799": {
+  "status": "future",
+  "name": "SMC Western Wisconsin Somerset Robotics Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "818": {
+  "status": "future",
+  "name": "MO - St. Therese Viking - Norse Code Challenge",
+  "matches": 0,
+  "detail": ""
+ },
+ "864": {
+  "status": "future",
+  "name": "Winter Classic at Mashpee Middle High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "885": {
+  "status": "future",
+  "name": "Buffett Middle School Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "917": {
+  "status": "future",
+  "name": "Goddard HS Rumble in the Den",
+  "matches": 0,
+  "detail": ""
+ },
+ "928": {
+  "status": "future",
+  "name": "Milton Academy January HS Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "1008": {
+  "status": "future",
+  "name": "Texas | Katy Ring in the Year",
+  "matches": 0,
+  "detail": ""
+ },
+ "1035": {
+  "status": "future",
+  "name": "Hopkinton January Tournament 2027",
+  "matches": 0,
+  "detail": ""
+ },
+ "1107": {
+  "status": "future",
+  "name": "Raging Bulls Stampede",
+  "matches": 0,
+  "detail": ""
+ },
+ "1143": {
+  "status": "future",
+  "name": "Robot Showdown Invitational",
+  "matches": 0,
+  "detail": ""
+ },
+ "1226": {
+  "status": "future",
+  "name": "Havoc on The Hill - DMV Rise Conference",
+  "matches": 0,
+  "detail": ""
+ },
+ "666": {
+  "status": "future",
+  "name": "2027 Mountaineer Achieve Competition - Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "1090": {
+  "status": "future",
+  "name": "The 3rd Annual Mrs. Philosopher's Get Together for RECF Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "1254": {
+  "status": "future",
+  "name": "Waianae High School Searider Robotics New Year 2027 Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "1181": {
+  "status": "future",
+  "name": "Online Challenges Cycle 1 - Build Instructions Challenge (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1184": {
+  "status": "future",
+  "name": "Online Challenges Cycle 1 - CAD Challenge - Auxiliary Part (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1188": {
+  "status": "future",
+  "name": "Online Challenges Cycle 1 - Community Outreach Challenge (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1195": {
+  "status": "future",
+  "name": "Online Challenges Cycle 1 - Game Design Challenge (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1200": {
+  "status": "future",
+  "name": "Online Challenges Cycle 1 - Leadership Challenge (Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "919": {
+  "status": "future",
+  "name": "Buena Vista Achieve Winter League",
+  "matches": 0,
+  "detail": ""
+ },
+ "875": {
+  "status": "future",
+  "name": "Sneaux Down Winter Achieve ",
+  "matches": 0,
+  "detail": ""
+ },
+ "91": {
+  "status": "future",
+  "name": "SC - The Clover Disco - Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "216": {
+  "status": "future",
+  "name": "SC - PCCTC Winter Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "274": {
+  "status": "future",
+  "name": "MO - Unitec Welcome Back Tournament ",
+  "matches": 0,
+  "detail": ""
+ },
+ "327": {
+  "status": "future",
+  "name": "TX- RECF Achieve Bridgeland High School Open",
+  "matches": 0,
+  "detail": ""
+ },
+ "392": {
+  "status": "future",
+  "name": "Shark Attack",
+  "matches": 0,
+  "detail": ""
+ },
+ "424": {
+  "status": "future",
+  "name": "CTEEA ST. Bernard HS qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "488": {
+  "status": "future",
+  "name": "2027 Marshall University Achieve Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "587": {
+  "status": "future",
+  "name": "Region 4 STEM Center RECF Robotics Competition hosted by Northwest High School ",
+  "matches": 0,
+  "detail": ""
+ },
+ "599": {
+  "status": "future",
+  "name": "Metal Mania - Mesa",
+  "matches": 0,
+  "detail": ""
+ },
+ "652": {
+  "status": "future",
+  "name": "Nathan Hale Middle School Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "733": {
+  "status": "future",
+  "name": "Trinity Knight Battle",
+  "matches": 0,
+  "detail": ""
+ },
+ "792": {
+  "status": "future",
+  "name": "Framingham January HS Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "820": {
+  "status": "future",
+  "name": "Pinnacle Bluegrass Battle",
+  "matches": 0,
+  "detail": ""
+ },
+ "870": {
+  "status": "future",
+  "name": "2027 Belmont Bot Bash",
+  "matches": 0,
+  "detail": ""
+ },
+ "910": {
+  "status": "future",
+  "name": "Southeast New Mexico Robotics Challenge",
+  "matches": 0,
+  "detail": ""
+ },
+ "929": {
+  "status": "future",
+  "name": "Wisconn Valley Achieve Robotics Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "983": {
+  "status": "future",
+  "name": "Damien High School Achieve Robotics Showdown",
+  "matches": 0,
+  "detail": ""
+ },
+ "1054": {
+  "status": "future",
+  "name": "The Potomac Winter Classic ",
+  "matches": 0,
+  "detail": ""
+ },
+ "1108": {
+  "status": "future",
+  "name": "Cobra Solo Challenge: Cabarrus County Schools Conference",
+  "matches": 0,
+  "detail": ""
+ },
+ "1118": {
+  "status": "future",
+  "name": "Tracy Triangle RECF Robotics Achieve Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "1225": {
+  "status": "future",
+  "name": "OSCS Winter Pinnacle Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "93": {
+  "status": "future",
+  "name": "Framingham January MS Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "425": {
+  "status": "future",
+  "name": "CTEEA St. Bernard Blended Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "673": {
+  "status": "future",
+  "name": "Graham Open Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "717": {
+  "status": "future",
+  "name": "RPI 2027 RECF Achieve Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "1095": {
+  "status": "future",
+  "name": "RECF Solo Remote Matches - Robotics Tournament (January 19th)",
+  "matches": 0,
+  "detail": ""
+ },
+ "126": {
+  "status": "future",
+  "name": "SC - Dorchester Achieve Qualifier_MS Only",
+  "matches": 0,
+  "detail": ""
+ },
+ "895": {
+  "status": "future",
+  "name": "LEEP3 the Pinnacle of Robotics",
+  "matches": 0,
+  "detail": ""
+ },
+ "67": {
+  "status": "future",
+  "name": "MO - Missouri - Troy Brain Freeze",
+  "matches": 0,
+  "detail": ""
+ },
+ "262": {
+  "status": "future",
+  "name": "Jr Searider 1st Annual Achieve Robotics Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "306": {
+  "status": "future",
+  "name": "Battle In The Grove",
+  "matches": 0,
+  "detail": ""
+ },
+ "575": {
+  "status": "future",
+  "name": "North Andover High School January Pinnacle Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "577": {
+  "status": "future",
+  "name": "CTEEA Weston HS Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "651": {
+  "status": "future",
+  "name": "Meadowlarks Games Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "737": {
+  "status": "future",
+  "name": "Swather Bot Special",
+  "matches": 0,
+  "detail": ""
+ },
+ "775": {
+  "status": "future",
+  "name": "[OLD DO NOT APPROVE]Mountain State Mayhem Signature Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "854": {
+  "status": "future",
+  "name": "Wildcats GHRC Pinnacle Qualifier @ RCDS",
+  "matches": 0,
+  "detail": ""
+ },
+ "872": {
+  "status": "future",
+  "name": "SoCal Greater LA Achieve Tournament #2",
+  "matches": 0,
+  "detail": ""
+ },
+ "877": {
+  "status": "future",
+  "name": "Mountain State Mayhem Signature Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "883": {
+  "status": "future",
+  "name": "Buena Vista Bison at Bluestem",
+  "matches": 0,
+  "detail": ""
+ },
+ "947": {
+  "status": "future",
+  "name": "Regional Robotics Competition - Capital Area STEM Network Center",
+  "matches": 0,
+  "detail": ""
+ },
+ "985": {
+  "status": "future",
+  "name": "Roboticon - Middle School Division",
+  "matches": 0,
+  "detail": ""
+ },
+ "1074": {
+  "status": "future",
+  "name": "Last Chance UIL State Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "1080": {
+  "status": "future",
+  "name": "Mechanically InKleined RECF Robotics Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "1135": {
+  "status": "future",
+  "name": "SC - Generals' Battle at Wade",
+  "matches": 0,
+  "detail": ""
+ },
+ "1142": {
+  "status": "future",
+  "name": "Duel in the Desert",
+  "matches": 0,
+  "detail": ""
+ },
+ "1146": {
+  "status": "future",
+  "name": "Viking Robotics: The Battle For Valhalla",
+  "matches": 0,
+  "detail": ""
+ },
+ "1231": {
+  "status": "future",
+  "name": "Tech Titans Robotic Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "1232": {
+  "status": "future",
+  "name": "Applied Tech Winter Classic",
+  "matches": 0,
+  "detail": ""
+ },
+ "578": {
+  "status": "future",
+  "name": "CTEEA Weston Blended Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "968": {
+  "status": "future",
+  "name": "CTEEA Greenwich Academy Blended Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "986": {
+  "status": "future",
+  "name": "Roboticon - High School Division",
+  "matches": 0,
+  "detail": ""
+ },
+ "500": {
+  "status": "future",
+  "name": "TX- RECF Achieve CFISD Spring Invitational",
+  "matches": 0,
+  "detail": ""
+ },
+ "249": {
+  "status": "future",
+  "name": "Gateway to the West Signature Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "478": {
+  "status": "future",
+  "name": "\u201cAI-Creation Cup\u201d EMBODIED INTELLIGENCE PACIFIC ASIAN Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "710": {
+  "status": "future",
+  "name": "South Korea Signature Event 2027",
+  "matches": 0,
+  "detail": ""
+ },
+ "208": {
+  "status": "future",
+  "name": "MCS ACHIEVE Middle School GHS 1.30.27--INVITATIONAL",
+  "matches": 0,
+  "detail": ""
+ },
+ "209": {
+  "status": "future",
+  "name": "MCS ACHIEVE High School GHS 1.30.27--INVITATIONAL",
+  "matches": 0,
+  "detail": ""
+ },
+ "242": {
+  "status": "future",
+  "name": "TX 5th BDE JROTC Robotics Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "265": {
+  "status": "future",
+  "name": "Randolph VT Robotics Tournament. ",
+  "matches": 0,
+  "detail": ""
+ },
+ "304": {
+  "status": "future",
+  "name": "SC - Sparks Winter Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "393": {
+  "status": "future",
+  "name": "West Texas - Clash in the Concho",
+  "matches": 0,
+  "detail": ""
+ },
+ "508": {
+  "status": "future",
+  "name": "CTEEA Danbury HS Blended Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "526": {
+  "status": "future",
+  "name": "Cheney Cardinal Clash VIII",
+  "matches": 0,
+  "detail": ""
+ },
+ "595": {
+  "status": "future",
+  "name": "Red Dirt Robotics: Achieve Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "598": {
+  "status": "future",
+  "name": "Red Dirt Robotics: Achieve High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "646": {
+  "status": "future",
+  "name": "North Sydney Boys ACHIEVE",
+  "matches": 0,
+  "detail": ""
+ },
+ "653": {
+  "status": "future",
+  "name": "Davis Middle School Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "720": {
+  "status": "future",
+  "name": "Arizona State University Polytechnic - Pinnacle Qualifier 2",
+  "matches": 0,
+  "detail": ""
+ },
+ "772": {
+  "status": "future",
+  "name": "\u7b2c\u5341\u4e5d\u5c4a\u201c\u4e9a\u673a\u8054\u201d\u676f\u4e9a\u6d32\u673a\u5668\u4eba\u9526\u6807\u8d5b",
+  "matches": 0,
+  "detail": ""
+ },
+ "780": {
+  "status": "future",
+  "name": "DuPont - Robo Rumble ",
+  "matches": 0,
+  "detail": ""
+ },
+ "860": {
+  "status": "future",
+  "name": "South High Robotics Showdown: Pinnacle",
+  "matches": 0,
+  "detail": ""
+ },
+ "913": {
+  "status": "future",
+  "name": "13th Annual Ishamon Harris Memorial Tornament",
+  "matches": 0,
+  "detail": ""
+ },
+ "944": {
+  "status": "future",
+  "name": "Battle for the West",
+  "matches": 0,
+  "detail": ""
+ },
+ "952": {
+  "status": "future",
+  "name": "DevilBots Brawl",
+  "matches": 0,
+  "detail": ""
+ },
+ "979": {
+  "status": "future",
+  "name": "Oxford Robotics Blended HS/MS Winter Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "980": {
+  "status": "future",
+  "name": "MO - Platte County Pirates Battle at the Brig",
+  "matches": 0,
+  "detail": ""
+ },
+ "991": {
+  "status": "future",
+  "name": "Rally in the Valley - Spring Valley HS Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "1006": {
+  "status": "future",
+  "name": "2026-2027 RECF Achieve Pinnacle at Omaha North",
+  "matches": 0,
+  "detail": ""
+ },
+ "1070": {
+  "status": "future",
+  "name": "Pinnacle on the Ridge",
+  "matches": 0,
+  "detail": ""
+ },
+ "1076": {
+  "status": "future",
+  "name": "Burkburnett Robotics Competition - Pinnacle ",
+  "matches": 0,
+  "detail": ""
+ },
+ "1113": {
+  "status": "future",
+  "name": "Pinnacle Pursuit",
+  "matches": 0,
+  "detail": ""
+ },
+ "1144": {
+  "status": "future",
+  "name": "Maker Faire SG",
+  "matches": 0,
+  "detail": ""
+ },
+ "1228": {
+  "status": "future",
+  "name": "Clash in the Concho",
+  "matches": 0,
+  "detail": ""
+ },
+ "279": {
+  "status": "future",
+  "name": "RECF-Achieve \u9ad8\u77bb\u8fdc\u77a9\u673a\u5668\u4eba\u7ade\u8d5b\u4e2d\u56fd\u533a\u603b\u51b3\u8d5b",
+  "matches": 0,
+  "detail": ""
+ },
+ "301": {
+  "status": "future",
+  "name": "Barney\u2019s Battle of the Bots",
+  "matches": 0,
+  "detail": ""
+ },
+ "275": {
+  "status": "future",
+  "name": "MO - Unitec State Last Chance Qualifier ",
+  "matches": 0,
+  "detail": ""
+ },
+ "316": {
+  "status": "future",
+  "name": "Bancroft RECF Achieve Robotics Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "349": {
+  "status": "future",
+  "name": "Conference - Lake Ridge Middle School Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "480": {
+  "status": "future",
+  "name": "Cougar Bot Wars",
+  "matches": 0,
+  "detail": ""
+ },
+ "684": {
+  "status": "future",
+  "name": "2026-27 Westwood Winter Classic - HS",
+  "matches": 0,
+  "detail": ""
+ },
+ "699": {
+  "status": "future",
+  "name": "Mimir Solo Match Only Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "770": {
+  "status": "future",
+  "name": "Spindletop Showdown",
+  "matches": 0,
+  "detail": ""
+ },
+ "831": {
+  "status": "future",
+  "name": "Moriarty HS Steel Stampede",
+  "matches": 0,
+  "detail": ""
+ },
+ "889": {
+  "status": "future",
+  "name": "SC - Bengal Bowl III",
+  "matches": 0,
+  "detail": ""
+ },
+ "891": {
+  "status": "future",
+  "name": "SFL Winter RECF Achieve Robotics Challenge 2026 - 2026-2027 Pinnacle at South Hollywood",
+  "matches": 0,
+  "detail": ""
+ },
+ "967": {
+  "status": "future",
+  "name": "CTEEA Haddam-Killingworth Blended Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "1041": {
+  "status": "future",
+  "name": "Cros-Lex MS/HS Pinnacle Tournament ",
+  "matches": 0,
+  "detail": ""
+ },
+ "1229": {
+  "status": "future",
+  "name": "Shocker Showdown",
+  "matches": 0,
+  "detail": ""
+ },
+ "1253": {
+  "status": "future",
+  "name": "2026 Heartland PWNament",
+  "matches": 0,
+  "detail": ""
+ },
+ "685": {
+  "status": "future",
+  "name": "2026-27 Westwood Winter Classic - MS",
+  "matches": 0,
+  "detail": ""
+ },
+ "552": {
+  "status": "future",
+  "name": "KCS RECF Achieve Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "548": {
+  "status": "future",
+  "name": "KCS RECF Achieve Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "612": {
+  "status": "future",
+  "name": "Legacy of Innovation Signature Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "845": {
+  "status": "future",
+  "name": "UIL - RECF Texas State Championships 6A",
+  "matches": 0,
+  "detail": ""
+ },
+ "1094": {
+  "status": "future",
+  "name": "RECF Solo Remote Matches - Robotics Tournament (February 11th)",
+  "matches": 0,
+  "detail": ""
+ },
+ "846": {
+  "status": "future",
+  "name": "UIL - RECF Texas State Championships 5A",
+  "matches": 0,
+  "detail": ""
+ },
+ "1043": {
+  "status": "future",
+  "name": "White Mountain Last Chance Qualifier RECF Achieve Blended Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "1088": {
+  "status": "future",
+  "name": "Hawaii Regional Championship High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "156": {
+  "status": "future",
+  "name": "2027 FVL Experience - MS Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "157": {
+  "status": "future",
+  "name": "2027 FVL Experience - HS Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "271": {
+  "status": "future",
+  "name": "ROM12 @ Purdue Polytechnic High School Last Chance Qualifying Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "305": {
+  "status": "future",
+  "name": "SC - PCCTC Last Chance SOLO Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "406": {
+  "status": "future",
+  "name": "SC - Choose The One RECF V5 Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "449": {
+  "status": "future",
+  "name": "Senior Night @ Desert Ridge High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "475": {
+  "status": "future",
+  "name": "6th Valentine- Middle School ONLY Desert Ridge School ",
+  "matches": 0,
+  "detail": ""
+ },
+ "527": {
+  "status": "future",
+  "name": "Cheney Cardinal CrossFire VIII",
+  "matches": 0,
+  "detail": ""
+ },
+ "654": {
+  "status": "future",
+  "name": "2027 ARMY JROTC 6TH BRIGADE CHAMPIONSHIP",
+  "matches": 0,
+  "detail": ""
+ },
+ "793": {
+  "status": "future",
+  "name": "Framingham February HS Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "847": {
+  "status": "future",
+  "name": "UIL - RECF Texas State Championships 4A",
+  "matches": 0,
+  "detail": ""
+ },
+ "848": {
+  "status": "future",
+  "name": "UIL - RECF Texas State Championships 1A-3A",
+  "matches": 0,
+  "detail": ""
+ },
+ "881": {
+  "status": "future",
+  "name": "Westview  High Wolverines Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "882": {
+  "status": "future",
+  "name": "Westview High Wolverines Achieve",
+  "matches": 0,
+  "detail": ""
+ },
+ "898": {
+  "status": "future",
+  "name": "2027 Sonoran Last Chance RECF Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "1117": {
+  "status": "future",
+  "name": "Pinnacle Summit Showdown",
+  "matches": 0,
+  "detail": ""
+ },
+ "1258": {
+  "status": "future",
+  "name": "Harvey School RECF Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "92": {
+  "status": "future",
+  "name": "Framingham February MS Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "583": {
+  "status": "future",
+  "name": "\"Heartbreaker\" Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "655": {
+  "status": "future",
+  "name": "2027 North/Central Florida High School Event Region Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "1048": {
+  "status": "future",
+  "name": "Australian National Championship ACHIEVE",
+  "matches": 0,
+  "detail": ""
+ },
+ "1148": {
+  "status": "future",
+  "name": "Hawaii Regional Championship Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "210": {
+  "status": "future",
+  "name": "2027 RECF Mississippi State Championship--ACHIEVE High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "211": {
+  "status": "future",
+  "name": "2027 RECF Mississippi State Championship--ACHIEVE Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "1101": {
+  "status": "future",
+  "name": "RECF Solo Remote Matches - Robotics Tournament (February 16th)",
+  "matches": 0,
+  "detail": ""
+ },
+ "851": {
+  "status": "future",
+  "name": "Texas Region 3 Achieve High School Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "325": {
+  "status": "future",
+  "name": "SCORE Showdown at Auburn University Signature Event",
+  "matches": 0,
+  "detail": ""
+ },
+ "1042": {
+  "status": "future",
+  "name": "Pinnacle Showdown at Immokalee High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "852": {
+  "status": "future",
+  "name": "Texas Region 3 Achieve Middle School Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "1038": {
+  "status": "future",
+  "name": "2027 Missouri State Championship - High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "114": {
+  "status": "future",
+  "name": " JROTC South Regional Drone ",
+  "matches": 0,
+  "detail": ""
+ },
+ "317": {
+  "status": "future",
+  "name": "Flight of the Falcons",
+  "matches": 0,
+  "detail": ""
+ },
+ "403": {
+  "status": "future",
+  "name": "AHS STEAM and JROTC Blended Achieve Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "410": {
+  "status": "future",
+  "name": "Alabama RECF Achieve State Championship Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "411": {
+  "status": "future",
+  "name": "Alabama RECF Achieve State Championship High School ",
+  "matches": 0,
+  "detail": ""
+ },
+ "416": {
+  "status": "future",
+  "name": "SC - ACTC Last Chance RECF Achieve Robotics Competition",
+  "matches": 0,
+  "detail": ""
+ },
+ "855": {
+  "status": "future",
+  "name": "NFDL \"Times Up!\" Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "921": {
+  "status": "future",
+  "name": "2027 WV RECF Achieve: St. Joseph Irish Classic",
+  "matches": 0,
+  "detail": ""
+ },
+ "1039": {
+  "status": "future",
+  "name": "2027 Missouri State Championship - Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "1134": {
+  "status": "future",
+  "name": "Cabarrus County Schools MS/HS Achieve Conference Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "1233": {
+  "status": "future",
+  "name": "Applied Tech Final Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "127": {
+  "status": "future",
+  "name": "CTEEA - Beman Pinnacle Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "580": {
+  "status": "future",
+  "name": "CTEEA Beman Blended Qualifier ",
+  "matches": 0,
+  "detail": ""
+ },
+ "1222": {
+  "status": "future",
+  "name": "North/Central Florida RECF Achieve Middle School Event Region Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "888": {
+  "status": "future",
+  "name": "2027 Nebraska State Achieve Championship - Middle School ",
+  "matches": 0,
+  "detail": ""
+ },
+ "1026": {
+  "status": "future",
+  "name": "Louisiana State Middle School Achieve Tournament ",
+  "matches": 0,
+  "detail": ""
+ },
+ "615": {
+  "status": "future",
+  "name": "CTEEA University Of New Haven High School Qualifier",
+  "matches": 0,
+  "detail": ""
+ },
+ "1025": {
+  "status": "future",
+  "name": "Louisiana State High School Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "1217": {
+  "status": "future",
+  "name": "Oregon RECF Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "1263": {
+  "status": "future",
+  "name": "DMV RISE Conference Championship - High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "1264": {
+  "status": "future",
+  "name": "DMV RISE Conference Championship - Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "363": {
+  "status": "future",
+  "name": "2027 RECF South Florida Event Region Championship--ACHIEVE High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "364": {
+  "status": "future",
+  "name": "2027 RECF Achieve South Florida Event Region Championship--Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "749": {
+  "status": "future",
+  "name": "Fallsburg RECF Achieve Pinacle Qualifying Tournament",
+  "matches": 0,
+  "detail": ""
+ },
+ "836": {
+  "status": "future",
+  "name": "Michigan RECF Achieve State Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "996": {
+  "status": "future",
+  "name": "2027 Oklahoma State Achieve Championship - High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "997": {
+  "status": "future",
+  "name": "2027 Oklahoma State Achieve Championship - Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "413": {
+  "status": "future",
+  "name": "Colorado State Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "692": {
+  "status": "future",
+  "name": "2027 West Virginia State Championship: Achieve MS",
+  "matches": 0,
+  "detail": ""
+ },
+ "887": {
+  "status": "future",
+  "name": "2027 Nebraska State Achieve Championship - High School ",
+  "matches": 0,
+  "detail": ""
+ },
+ "1062": {
+  "status": "future",
+  "name": "Kansas State Middle School Championship ",
+  "matches": 0,
+  "detail": ""
+ },
+ "1125": {
+  "status": "future",
+  "name": "South Carolina Achieve State Championship- Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "1126": {
+  "status": "future",
+  "name": "South Carolina Achieve State Championship - High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "62": {
+  "status": "future",
+  "name": "JROTC All-Service Robotics National Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "693": {
+  "status": "future",
+  "name": "2027 West Virginia State Championship: Achieve HS",
+  "matches": 0,
+  "detail": ""
+ },
+ "1016": {
+  "status": "future",
+  "name": "Falcon Frenzy",
+  "matches": 0,
+  "detail": ""
+ },
+ "1065": {
+  "status": "future",
+  "name": "Kansas State High School Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "1086": {
+  "status": "future",
+  "name": "Texas Region 2 State Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "1119": {
+  "status": "future",
+  "name": "2027 California Region 2 RECF Robotics Achieve High School Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "938": {
+  "status": "future",
+  "name": "2027 Wisconsin RECF Robotics State Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "939": {
+  "status": "future",
+  "name": "2027 Wisconsin RECF Robotics State Championship",
+  "matches": 0,
+  "detail": ""
+ },
+ "637": {
+  "status": "future",
+  "name": "2027 CREATE U.S. Open Robotics Tournament-Achieve Middle School",
+  "matches": 0,
+  "detail": ""
+ },
+ "707": {
+  "status": "future",
+  "name": "2027 CREATE U.S. Open Robotics Tournament (MS Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "674": {
+  "status": "future",
+  "name": "2027 CREATE U.S. Open Robotics Tournament-Achieve High School",
+  "matches": 0,
+  "detail": ""
+ },
+ "706": {
+  "status": "future",
+  "name": "2027 CREATE U.S. Open Robotics Tournament (HS Achieve)",
+  "matches": 0,
+  "detail": ""
+ },
+ "1129": {
+  "status": "future",
+  "name": "2027 Texas TSA State Conference Achieve Pinnacle (Blended Event)",
+  "matches": 0,
+  "detail": ""
+ }
+}
