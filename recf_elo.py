@@ -377,13 +377,15 @@ def norm_match(m, include_playoffs, skip_surrogates=False):
     playoff = rnd in PLAYOFF_ROUNDS
     if rnd != QUAL_ROUND and not (playoff and include_playoffs):
         return None
-    sides = {}
+    sides, sur = {}, set()
     for a in m.get("alliances") or []:
         teams = []
         for at in a.get("teams") or []:
             t = at.get("team") or {}
             key = t.get("code") or (str(t["id"]) if t.get("id") is not None else None)
             if key:
+                if at.get("sitting"):
+                    sur.add(key)          # real surrogate flag (kept for display even when surrogates count)
                 teams.append((key, t.get("name") or "", bool(at.get("sitting")) and skip_surrogates))
         if teams and a.get("color") in ("red", "blue"):
             sides[a["color"]] = (teams, int(a.get("score") or 0))
@@ -393,12 +395,31 @@ def norm_match(m, include_playoffs, skip_surrogates=False):
     if (rs == 0 and bs == 0) or {t[0] for t in red} & {t[0] for t in blue}:
         return None
     return {"key": (m.get("scheduled") or "9999", rnd, m.get("instance") or 0, m.get("matchnum") or 0),
-            "red": red, "blue": blue, "rs": rs, "bs": bs, "playoff": playoff}
+            "red": red, "blue": blue, "rs": rs, "bs": bs, "playoff": playoff,
+            "id": m.get("id"), "name": m.get("name") or "", "round": rnd, "instance": m.get("instance") or 0,
+            "matchnum": m.get("matchnum") or 0, "scheduled": m.get("scheduled") or "", "field": m.get("field") or "",
+            "sur": sur}
+
+
+def json_match(m, div_id):
+    """Every match as published in events/{id}.json (scored or not, any round)."""
+    def side(color):
+        for al in m.get("alliances") or []:
+            if al.get("color") == color:
+                sc = al.get("score")
+                return {"score": int(sc) if sc is not None else None,
+                        "teams": [{"code": str((at.get("team") or {}).get("code") or (at.get("team") or {}).get("id") or ""),
+                                   "name": ((at.get("team") or {}).get("name") or "").strip(),
+                                   "sitting": bool(at.get("sitting"))} for at in al.get("teams") or []]}
+        return {"score": None, "teams": []}
+    return {"id": m.get("id"), "name": m.get("name") or "", "round": m.get("round"), "instance": m.get("instance") or 0,
+            "matchnum": m.get("matchnum") or 0, "scheduled": m.get("scheduled") or None, "field": m.get("field") or None,
+            "scored": bool(m.get("scored")), "division": div_id, "red": side("red"), "blue": side("blue")}
 
 
 def load_event(client, eid, a):
     """-> dict(status, detail, name, event). status: ok | empty | partial | failed | notfound | future"""
-    res = {"status": "failed", "detail": "", "name": "", "event": None, "matches": 0}
+    res = {"status": "failed", "detail": "", "name": "", "event": None, "matches": 0, "jmatches": []}
     def event_ttl(d):
         # divisions/dates can appear or change until the event has run, so don't trust old copies
         start = parse_iso(d.get("start"))
@@ -423,7 +444,7 @@ def load_event(client, eid, a):
         return res
     recent = is_recent(ev, a.recent_days)
     ttl_for = lambda d: a.empty_ttl_hours if not d else (a.recent_ttl_hours if recent else None)
-    matches, failed = [], []
+    matches, failed, jm = [], [], []
     for d in ev.get("divisions") or []:
         try:
             rows = client.cached(f"matches_{eid}_{d['id']}",
@@ -432,9 +453,12 @@ def load_event(client, eid, a):
             failed.append(f"division {d['id']}: {e}")
             continue
         for m in rows:
+            jm.append(json_match(m, d["id"]))
             nm = norm_match(m, a.include_playoffs, a.skip_surrogates)
             if nm:
+                nm["div"] = d["id"]
                 matches.append(nm)
+    res["jmatches"] = jm
     res["matches"] = len(matches)
     res["detail"] = "; ".join(failed)
     if matches:
@@ -488,8 +512,8 @@ def load_skills(client, eids, a):
 
 def load_team_meta(client, eids, info, a):
     """Grade level / home region from /events/{id}/teams (falls back to /teams?event[]=).
-    -> ({team: {"grade", "team_region", "organization"}}, available)"""
-    meta, failed, misses, got = {}, [], 0, 0
+    -> ({team: {"grade", "team_region", "organization"}}, available, {event id: [registered teams]})"""
+    meta, failed, misses, got, per_event = {}, [], 0, 0, {}
 
     def fetch(eid):
         try:
@@ -507,27 +531,32 @@ def load_team_meta(client, eids, info, a):
             misses += 1
             if misses >= 3 and not got:
                 print("  team-list routes look unavailable on this API: grade level will be blank.", file=sys.stderr)
-                return meta, False
+                return meta, False, per_event
             continue
         except FetchError:
             failed.append(eid)
             continue
         misses, got = 0, got + 1
+        lst = per_event[eid] = []
         for tm in rows:
             key = tm.get("number") or tm.get("code") or (tm.get("team") or {}).get("code")
             if not key:
                 continue
             m = meta.setdefault(str(key), {})
-            if (tm.get("grade") or "").strip():
-                m["grade"] = tm["grade"].strip()
+            grade = (tm.get("grade") or "").strip()
             reg = canon_region((tm.get("location") or {}).get("region"))
+            org = (tm.get("organization") or "").strip()
+            if grade:
+                m["grade"] = grade
             if reg:
                 m["team_region"] = reg
-            if (tm.get("organization") or "").strip():
-                m["organization"] = tm["organization"].strip()
+            if org:
+                m["organization"] = org
+            lst.append({"code": str(key), "name": (tm.get("team_name") or tm.get("name") or "").strip(),
+                        "organization": org or None, "grade": grade or None, "region": reg or None})
     if failed:
         print(f"  team lists failed for {len(failed)} events (re-run to retry): {failed[:10]}", file=sys.stderr)
-    return meta, bool(got)
+    return meta, bool(got), per_event
 
 
 def best_skills(by_event):
@@ -551,32 +580,53 @@ def build_solo_scores(by_event, info, meta):
       then repeat 1-4 with each team's 2nd-highest result, then its 3rd-highest.
     The API exposes only each team's best result per event, so "2nd/3rd-highest" means the 2nd/3rd-best EVENT result
     (individual attempts within an event are not available). Missing results count as 0. Only teams tied on every
-    key share a rank (1, 2, 2, 4 ...)."""
+    key share a rank (1, 2, 2, 4 ...).
+    Event names: every best / 2nd / 3rd coding and driving result also carries the name of the event it came from
+    (*_event). event_2nd / event_3rd give one name: the event if coding and driving came from the same one, otherwise
+    "<coding event> (coding) / <driving event> (driving)"."""
     teams = {}
     for eid, tdict in by_event.items():
         start = info.get(eid, {}).get("start", "")
         for code, s in tdict.items():
-            r = teams.setdefault(code, {"name": "", "cs": [], "ds": [], "top": None, "n": 0})
+            r = teams.setdefault(code, {"name": "", "cl": [], "dl": [], "top": None, "n": 0})
             r["name"] = s["name"] or r["name"]
-            r["cs"].append(s["programming"])
-            r["ds"].append(s["driver"])
+            r["cl"].append((s["programming"], start, eid))
+            r["dl"].append((s["driver"], start, eid))
             r["n"] += 1
             key = (s["driver"] + s["programming"], start, eid)
             if r["top"] is None or key > r["top"][0]:
                 r["top"] = (key, s["driver"], s["programming"], eid)
+
+    def pick(lst, i):
+        """(score, event name) of the i-th best result; (0, "") when the team has no such result."""
+        srt = sorted(lst, reverse=True)
+        if i < len(srt) and srt[i][0] > 0:
+            return srt[i][0], info.get(srt[i][2], {}).get("name", "")
+        return 0, ""
+
     rows = []
     for code, r in teams.items():
         (score, _, _), d, p, eid = r["top"]
         if score <= 0:
             continue
-        cs = sorted(r["cs"], reverse=True) + [0, 0, 0]
-        ds = sorted(r["ds"], reverse=True) + [0, 0, 0]
+        c = [pick(r["cl"], i) for i in range(3)]
+        dd = [pick(r["dl"], i) for i in range(3)]
+
+        def one(i):
+            a_, b_ = c[i][1], dd[i][1]
+            return f"{a_} (coding) / {b_} (driving)" if a_ and b_ and a_ != b_ else (a_ or b_)
+
         ei, m = info.get(eid, {}), meta.get(code, {})
         rows.append({"team": code, "name": r["name"], "event_region": ei.get("region", ""),
                      "grade": m.get("grade", ""), "score": score, "coding": p, "driving": d,
-                     "best_coding": cs[0], "best_driving": ds[0], "event": ei.get("name", ""), "events": r["n"],
-                     "coding_2nd": cs[1], "driving_2nd": ds[1], "coding_3rd": cs[2], "driving_3rd": ds[2],
-                     "_tb": (score, cs[0], ds[0], cs[1], ds[1], cs[2], ds[2])})
+                     "best_coding": c[0][0], "best_driving": dd[0][0], "event": ei.get("name", ""), "event_id": eid,
+                     "events": r["n"],
+                     "coding_2nd": c[1][0], "driving_2nd": dd[1][0], "coding_3rd": c[2][0], "driving_3rd": dd[2][0],
+                     "best_coding_event": c[0][1], "best_driving_event": dd[0][1],
+                     "coding_2nd_event": c[1][1], "driving_2nd_event": dd[1][1],
+                     "coding_3rd_event": c[2][1], "driving_3rd_event": dd[2][1],
+                     "event_2nd": one(1), "event_3rd": one(2),
+                     "_tb": (score, c[0][0], dd[0][0], c[1][0], dd[1][0], c[2][0], dd[2][0])})
     rows.sort(key=lambda x: (tuple(-v for v in x["_tb"]), x["team"]))
     for i, x in enumerate(rows, 1):
         x["rank"] = rows[i - 2]["rank"] if i > 1 and x["_tb"] == rows[i - 2]["_tb"] else i
@@ -587,13 +637,65 @@ def write_solo_scores(rows, out_dir):
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "solo_scores.csv")
     cols = ["rank", "team", "name", "event_region", "grade", "score", "coding", "driving",
-            "best_coding", "best_driving", "event", "events",
-            "coding_2nd", "driving_2nd", "coding_3rd", "driving_3rd"]
+            "best_coding", "best_driving", "event", "event_id", "events",
+            "coding_2nd", "driving_2nd", "coding_3rd", "driving_3rd", "event_2nd", "event_3rd",
+            "best_coding_event", "best_driving_event", "coding_2nd_event", "driving_2nd_event",
+            "coding_3rd_event", "driving_3rd_event"]
     with open(path, "w", newline="", encoding="utf-8-sig") as f:
         w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(rows)
     return path
+
+
+def upcoming_event_ids(client, report, a):
+    """Future events starting within --upcoming-days: we fetch their registered teams so scouting works early."""
+    out = []
+    for eid, r in report.items():
+        if r["status"] != "future":
+            continue
+        rec = client.cache_read(f"event_{eid}")
+        s = parse_iso((rec[0] if rec and isinstance(rec[0], dict) else {}).get("start"))
+        if s and 0 <= (s - _now()).total_seconds() <= a.upcoming_days * 86400:
+            out.append(eid)
+    return out
+
+
+def load_rankings(client, eids, a):
+    """Official qualification rankings per division from /events/{id}/divisions/{div}/rankings.
+    -> ({event id: [row]}, available). Missing route / failures just mean the event file has no rankings."""
+    out, misses, got = {}, 0, 0
+    for eid in eids:
+        client.cool_if_needed()
+        _, ev = event_info(client, eid)
+        recent = bool(ev) and is_recent(ev, a.recent_days)
+        for d in ev.get("divisions") or []:
+            try:
+                rows = client.cached(f"rankings_{eid}_{d['id']}",
+                                     lambda eid=eid, d=d: client.paged(f"/events/{eid}/divisions/{d['id']}/rankings"),
+                                     _ttl_fn(a, recent))
+            except NotFound:
+                misses += 1
+                if misses >= 3 and not got:
+                    print("  rankings route looks unavailable on this API: event standings stay derived.", file=sys.stderr)
+                    return out, False
+                continue
+            except FetchError:
+                continue
+            misses, got = 0, got + 1
+            for r in rows:
+                tm = r.get("team") or {}
+                code = tm.get("code") or tm.get("id")
+                if code is None:
+                    continue
+                out.setdefault(eid, []).append({
+                    "division": d["id"], "rank": r.get("rank"), "team": str(code), "name": (tm.get("name") or "").strip(),
+                    "wins": r.get("wins"), "losses": r.get("losses"), "ties": r.get("ties"), "wp": r.get("wp"),
+                    "ap": r.get("ap"), "sp": r.get("sp"), "high_score": r.get("high_score"),
+                    "average_points": r.get("average_points"), "total_points": r.get("total_points")})
+        if eid in out:
+            out[eid].sort(key=lambda x: (x["division"], x["rank"] if x["rank"] is not None else 10 ** 9))
+    return out, bool(got)
 
 
 def fetch_all(a):
@@ -612,7 +714,7 @@ def fetch_all(a):
     ids = list(dict.fromkeys(ids))
     print(f"{len(ids)} candidate events; cache dir: {a.cache or '(disabled)'}", file=sys.stderr)
 
-    events, report, tally = [], {}, Counter()
+    events, report, tally, event_matches = [], {}, Counter(), {}
     i = 0
     try:
         for i, eid in enumerate(ids, 1):
@@ -622,6 +724,8 @@ def fetch_all(a):
             report[eid] = {k: res[k] for k in ("status", "name", "matches", "detail")}
             if res["event"]:
                 events.append(res["event"])
+            if res["jmatches"]:
+                event_matches[eid] = res["jmatches"]
             if res["status"] in ("failed", "partial", "notfound"):
                 print(f"  event {eid} {res['status']}: {res['detail']}", file=sys.stderr)
             if i % 10 == 0 or i == len(ids):
@@ -634,12 +738,17 @@ def fetch_all(a):
     except KeyboardInterrupt:
         print("\nInterrupted. Progress is saved; re-run to continue.", file=sys.stderr)
         sys.exit(130)
-    world = {"by_event": {}, "info": {}, "meta": {}, "teams_ok": False}
+    world = {"by_event": {}, "info": {}, "meta": {}, "teams_ok": False, "event_matches": event_matches,
+             "event_teams": {}, "rankings": {}, "rankings_ok": False, "upcoming": [], "ids": ids}
     sk_ids = [eid for eid, r in report.items() if r["status"] in ("ok", "empty", "partial")]
+    world["upcoming"] = upcoming = upcoming_event_ids(client, report, a)
     print(f"Loading solo skills for {len(sk_ids)} started events (includes solo-only events) ...", file=sys.stderr)
     try:
         world["by_event"], world["info"] = load_skills(client, sk_ids, a)
-        world["meta"], world["teams_ok"] = load_team_meta(client, sk_ids, world["info"], a)
+        for eid in upcoming:
+            world["info"][eid] = event_info(client, eid)[0]
+        world["meta"], world["teams_ok"], world["event_teams"] = load_team_meta(client, sk_ids + upcoming, world["info"], a)
+        world["rankings"], world["rankings_ok"] = load_rankings(client, sk_ids, a)
         cache_awards(client, sk_ids, a)
     except Abort as e:
         print(f"\nSTOPPED during skills: {e}. Re-run later.", file=sys.stderr)
@@ -820,26 +929,37 @@ def ts_update(red, blue, outcome):
                 p[1] = math.sqrt(var * (1 - (var / c ** 2) * w))
 
 
-def run_trueskill(events, seeds=None):
-    """-> {team: {"mu","sigma","ts_rating"}}; ts_rating = mu - 3*sigma (conservative)."""
-    seeds = seeds or {}
-    ratings = {}
+class TS:
+    """TrueSkill ratings, fed one match at a time (so snapshots can be taken between events)."""
 
-    def get(k):
-        if k not in ratings:
-            mu = TS_MU + TS_SEED_SCALE * (seeds[k] - BASE_RATING) / SEED_SCALE if k in seeds else TS_MU
-            ratings[k] = [mu, TS_SIGMA]
-        return ratings[k]
+    def __init__(self, seeds=None):
+        self.seeds, self.r = seeds or {}, {}
 
-    for _, m in iter_matches(events):
-        red = [[*get(k), not sit] for k, _, sit in m["red"]]
-        blue = [[*get(k), not sit] for k, _, sit in m["blue"]]
+    def get(self, k):
+        if k not in self.r:
+            mu = TS_MU + TS_SEED_SCALE * (self.seeds[k] - BASE_RATING) / SEED_SCALE if k in self.seeds else TS_MU
+            self.r[k] = [mu, TS_SIGMA]
+        return self.r[k]
+
+    def play(self, m):
+        red = [[*self.get(k), not sit] for k, _, sit in m["red"]]
+        blue = [[*self.get(k), not sit] for k, _, sit in m["blue"]]
         outcome = 1 if m["rs"] > m["bs"] else -1 if m["rs"] < m["bs"] else 0
         ts_update(red, blue, outcome)
         for (k, _, sit), p in zip(m["red"] + m["blue"], red + blue):
             if not sit:
-                ratings[k] = [p[0], p[1]]
-    return {k: {"mu": mu, "sigma": sg, "ts_rating": mu - 3 * sg} for k, (mu, sg) in ratings.items()}
+                self.r[k] = [p[0], p[1]]
+
+    def out(self):
+        return {k: {"mu": mu, "sigma": sg, "ts_rating": mu - 3 * sg} for k, (mu, sg) in self.r.items()}
+
+
+def run_trueskill(events, seeds=None):
+    """-> {team: {"mu","sigma","ts_rating"}}; ts_rating = mu - 3*sigma (conservative)."""
+    ts = TS(seeds)
+    for _, m in iter_matches(events):
+        ts.play(m)
+    return ts.out()
 
 
 def _solve(a, b):
@@ -864,47 +984,59 @@ def _solve(a, b):
     return x
 
 
-def run_ccwm(events):
+def _event_ccwm(ev):
+    """One event's OPR / DPR by least squares on alliance rows (qualification matches only, at least 4).
+    -> {team: (opr, dpr, matches played)} or None."""
+    ms = [m for m in ev["matches"] if not m["playoff"]]   # qualification only (no alliance-selection bias)
+    if len(ms) < 4:
+        return None
+    idx, played = {}, {}
+
+    def var(k, sitting):
+        key = f"{k}#S" if sitting else k   # one throwaway variable absorbs a surrogate's contribution
+        if key not in idx:
+            idx[key] = len(idx)
+        return idx[key]
+
+    rows = []   # one row per ALLIANCE: (member columns, own score, opponent score)
+    for m in ms:
+        rows.append(([var(k, s) for k, _, s in m["red"]], m["rs"], m["bs"]))
+        rows.append(([var(k, s) for k, _, s in m["blue"]], m["bs"], m["rs"]))
+        for k, _, s in m["red"] + m["blue"]:
+            if not s:
+                played[k] = played.get(k, 0) + 1
+    n = len(idx)
+    ata = [[0.0] * n for _ in range(n)]
+    rhs_o, rhs_d = [0.0] * n, [0.0] * n
+    for cols, own, opp in rows:
+        for i in cols:
+            rhs_o[i] += own
+            rhs_d[i] += opp
+            for j in cols:
+                ata[i][j] += 1.0
+    for i in range(n):
+        ata[i][i] += CCWM_RIDGE
+    opr, dpr = _solve(ata, rhs_o), _solve(ata, rhs_d)
+    return {k: (opr[idx[k]], dpr[idx[k]], cnt) for k, cnt in played.items()}
+
+
+def run_ccwm(events, per_event=None):
     """Per-event OPR, DPR and CCWM by least squares on alliance rows, averaged across events (match-weighted).
     OPR: own alliance score ~ sum of teammates' OPR.  DPR: opponents' score ~ sum of teammates' DPR.
     CCWM = OPR - DPR (least squares is linear, so this equals regressing the margin directly).
+    If per_event is a dict it is filled with {event id: {team: (opr, dpr, matches)}}.
     -> {team: {"opr_avg", "dpr_avg", "ccwm_avg", "ccwm_events", "ccwm_matches"}}"""
     acc = {}
     for ev in events:
-        ms = [m for m in ev["matches"] if not m["playoff"]]   # qualification only (no alliance-selection bias)
-        if len(ms) < 4:
+        res = _event_ccwm(ev)
+        if not res:
             continue
-        idx, played = {}, {}
-
-        def var(k, sitting):
-            key = f"{k}#S" if sitting else k   # one throwaway variable absorbs a surrogate's contribution
-            if key not in idx:
-                idx[key] = len(idx)
-            return idx[key]
-
-        rows = []   # one row per ALLIANCE: (member columns, own score, opponent score)
-        for m in ms:
-            rows.append(([var(k, s) for k, _, s in m["red"]], m["rs"], m["bs"]))
-            rows.append(([var(k, s) for k, _, s in m["blue"]], m["bs"], m["rs"]))
-            for k, _, s in m["red"] + m["blue"]:
-                if not s:
-                    played[k] = played.get(k, 0) + 1
-        n = len(idx)
-        ata = [[0.0] * n for _ in range(n)]
-        rhs_o, rhs_d = [0.0] * n, [0.0] * n
-        for cols, own, opp in rows:
-            for i in cols:
-                rhs_o[i] += own
-                rhs_d[i] += opp
-                for j in cols:
-                    ata[i][j] += 1.0
-        for i in range(n):
-            ata[i][i] += CCWM_RIDGE
-        opr, dpr = _solve(ata, rhs_o), _solve(ata, rhs_d)
-        for k, cnt in played.items():
+        if per_event is not None:
+            per_event[ev["id"]] = res
+        for k, (o, d, cnt) in res.items():
             cur = acc.setdefault(k, [0.0, 0.0, 0, 0])
-            cur[0] += opr[idx[k]] * cnt
-            cur[1] += dpr[idx[k]] * cnt
+            cur[0] += o * cnt
+            cur[1] += d * cnt
             cur[2] += cnt
             cur[3] += 1
     return {k: {"opr_avg": o / n, "dpr_avg": d / n, "ccwm_avg": (o - d) / n, "ccwm_events": e, "ccwm_matches": n}
@@ -1047,6 +1179,273 @@ def write_outputs(rows, out_dir):
     return path
 
 
+# ----------------------------- history + JSON publishing ------------------
+SCHEMA_VERSION = 1
+METHOD_VERSION = "2026.11.2"          # bump whenever a rating / value constant changes
+TEST_EVENT_PATTERN = re.compile(r"\b(test|tests|testing|demo|sandbox)\b", re.I)
+LIVE_HOURS_AFTER_END = 36
+TEAM_FIELDS = ["team", "name", "organization", "region", "grade", "value", "value_elo", "value_ts", "value_ccwm",
+               "value_solo", "rank", "rating", "adj_rating", "matches", "wins", "losses", "ties", "events", "seed",
+               "component", "main_component", "ranked", "ts_rank", "ts_rating", "ts_mu", "ts_sigma", "ccwm_rank",
+               "ccwm_avg", "opr_avg", "dpr_avg", "ccwm_events", "score", "coding", "driving", "last_match_at"]
+SOLO_FIELDS = ["rank", "team", "name", "event_region", "grade", "score", "coding", "driving", "best_coding",
+               "best_driving", "event", "event_id", "events", "coding_2nd", "driving_2nd", "coding_3rd",
+               "driving_3rd", "event_2nd", "event_3rd", "best_coding_event", "best_driving_event",
+               "coding_2nd_event", "driving_2nd_event", "coding_3rd_event", "driving_3rd_event"]
+
+
+def iso_utc(ts=None):
+    return datetime.fromtimestamp(time.time() if ts is None else ts, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def is_test_event(name):
+    return bool(TEST_EVENT_PATTERN.search(name or ""))
+
+
+def is_live(ev):
+    """Started, and not more than LIVE_HOURS_AFTER_END hours past the (date-only) end of the event."""
+    start = parse_iso(ev.get("start"))
+    end = parse_iso(ev.get("end") or ev.get("start"))
+    if not start or start > _now():
+        return False
+    return (_now() - (end or start)).total_seconds() < LIVE_HOURS_AFTER_END * 3600
+
+
+def _null(v):
+    return None if v in ("", None) else v
+
+
+def build_history(events, seeds, by_event, info, ccwm_ev):
+    """Each team's state after every event it played, in date order (rating, TrueSkill, CCWM and solo score
+    to date, and the overall value computed from those). -> {team: [entry, ...]}"""
+    elo, ts = Elo(seeds), TS(seeds)
+    solo = {}
+    for eid, tdict in by_event.items():
+        st = info.get(eid, {}).get("start", "")
+        for code, s in tdict.items():
+            solo.setdefault(code, []).append((st, str(eid), s["driver"] + s["programming"]))
+    cc, hist = {}, {}
+    for ev in sorted(events, key=lambda e: (e["start"], str(e["id"]))):
+        w, played = event_weight(ev), set()
+        for m in sorted(ev["matches"], key=lambda x: x["key"]):
+            elo.play(m, w, ev["id"])
+            ts.play(m)
+            played.update(k for k, _, _ in m["red"] + m["blue"])
+        for k, (o, d, cnt) in (ccwm_ev.get(ev["id"]) or {}).items():
+            cur = cc.setdefault(k, [0.0, 0])
+            cur[0] += (o - d) * cnt
+            cur[1] += cnt
+        ev_key = (ev["start"], str(ev["id"]))
+        for k in sorted(played):
+            t = elo.teams[k]
+            adj = round(t["seed"] + t["n"] / (t["n"] + SHRINK_N) * (t["rating"] - t["seed"]), 1)
+            mu, sg = ts.r[k]
+            tsr = round(mu - 3 * sg, 2)
+            cavg = round(cc[k][0] / cc[k][1], 2) if k in cc and cc[k][1] else None
+            sc = [c for st, e2, c in solo.get(k, []) if (st, e2) <= ev_key]
+            score = max(sc) if sc and max(sc) > 0 else None
+            value, _ = team_value(adj, tsr, cavg, t["n"], score)
+            hist.setdefault(k, []).append({
+                "event_id": ev["id"], "at": ev["start"] or None, "matches": t["n"], "rating": round(t["rating"], 1),
+                "adj_rating": adj, "ts_mu": round(mu, 2), "ts_sigma": round(sg, 2), "ts_rating": tsr,
+                "ccwm_avg": cavg, "solo_score": score, "value": value})
+    return hist
+
+
+def build_team_matches(world):
+    """{team: [match entries]} from every match of every event (scored or still scheduled)."""
+    out = {}
+    for eid, jms in world["event_matches"].items():
+        for m in jms:
+            for color, other in (("red", "blue"), ("blue", "red")):
+                side, opp = m[color], m[other]
+                for tm in side["teams"]:
+                    if not tm["code"]:
+                        continue
+                    sf, sa, scored = side["score"], opp["score"], m["scored"]
+                    res = None
+                    if scored and sf is not None and sa is not None:
+                        res = "W" if sf > sa else "L" if sf < sa else "T"
+                    out.setdefault(tm["code"], []).append({
+                        "event_id": eid, "name": m["name"], "round": m["round"], "instance": m["instance"],
+                        "matchnum": m["matchnum"], "scheduled": m["scheduled"], "field": m["field"], "scored": scored,
+                        "color": color, "partners": [x["code"] for x in side["teams"] if x["code"] != tm["code"]],
+                        "opponents": [x["code"] for x in opp["teams"]],
+                        "score_for": sf if scored else None, "score_against": sa if scored else None,
+                        "result": res, "sitting": tm["sitting"]})
+    for lst in out.values():
+        lst.sort(key=lambda x: (x["scheduled"] or "", str(x["event_id"]), x["round"] or 0, x["matchnum"]))
+    return out
+
+
+def event_record(client, eid, report, world):
+    """One line of events.json."""
+    rec = client.cache_read(f"event_{eid}")
+    ev = rec[0] if rec and isinstance(rec[0], dict) else {}
+    loc = ev.get("location") or {}
+    r = report.get(eid, {})
+    stamps = [rec[1]] if rec else []
+    for d in ev.get("divisions") or []:
+        mr = client.cache_read(f"matches_{eid}_{d['id']}")
+        if mr:
+            stamps.append(mr[1])
+    codes = {x["code"] for m in world["event_matches"].get(eid, []) for s in (m["red"], m["blue"])
+             for x in s["teams"] if x["code"]}
+    codes.update(world["by_event"].get(eid, {}).keys())
+    registered = world["event_teams"].get(eid)
+    name = ev.get("name") or r.get("name", "")
+    return {"id": eid, "code": ev.get("sku"), "name": name, "start": ev.get("start"), "end": ev.get("end"),
+            "city": loc.get("city"),
+            "region": canon_region(loc.get("region") or loc.get("city") or loc.get("country") or "") or None,
+            "country": loc.get("country"), "level": ev.get("level"), "event_type": ev.get("event_type"),
+            "status": r.get("status", "pending"), "matches": r.get("matches", 0),
+            "teams": len(registered) if registered else len(codes), "live": is_live(ev),
+            "is_test": is_test_event(name), "updated_at": iso_utc(max(stamps)) if stamps else None}, ev
+
+
+def write_json(path, obj):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    os.replace(tmp, path)          # atomic: a crash never leaves a half-written file
+
+
+def publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev, history, t_start):
+    """Write the v1 JSON files (meta, teams, solo, events, regions, events/{id}, teams/{code})."""
+    out = a.json_out or os.path.join(a.out, "v1")
+    now = iso_utc()
+
+    def wrap(**kw):
+        return {"schemaVersion": SCHEMA_VERSION, "generatedAt": now, **kw}
+
+    tmatches = build_team_matches(world)
+    by_event, meta = world["by_event"], world["meta"]
+
+    # ---- teams.json
+    teams = []
+    for r in rows:
+        d = {k: _null(r.get(k)) for k in TEAM_FIELDS}
+        d["team"], d["name"] = r["team"], r["name"]
+        d["organization"] = meta.get(r["team"], {}).get("organization")
+        scored = [m["scheduled"] for m in tmatches.get(r["team"], []) if m["scored"] and m["scheduled"]]
+        d["last_match_at"] = max(scored) if scored else None
+        d["ranked"], d["main_component"] = bool(r["ranked"]), bool(r["main_component"])
+        teams.append(d)
+
+    # ---- events.json
+    ev_index, ev_raw = {}, {}
+    for eid in world["ids"]:
+        ev_index[eid], ev_raw[eid] = event_record(client, eid, report, world)
+    ev_list = sorted(ev_index.values(), key=lambda e: (e["start"] or "", str(e["id"])), reverse=True)
+
+    # ---- solo.json
+    solo = [{k: _null(x.get(k)) for k in SOLO_FIELDS} for x in ws_rows]
+
+    # ---- regions.json
+    regs = {}
+    for d in teams:
+        if d["region"]:
+            regs.setdefault(d["region"], {"teams": [], "events": 0, "matches": 0})["teams"].append(d)
+    for e in ev_index.values():
+        if e["region"] and e["status"] in ("ok", "partial", "empty", "future"):
+            b = regs.setdefault(e["region"], {"teams": [], "events": 0, "matches": 0})
+            b["events"] += 1
+            b["matches"] += e["matches"] or 0
+    regions = []
+    for name, b in sorted(regs.items()):
+        ranked = [d for d in b["teams"] if d["ranked"] and d["value"] is not None]
+        top = sorted(ranked, key=lambda d: (-d["value"], -(d["adj_rating"] or 0), d["team"]))[:5]
+        regions.append({"region": name, "members": next((list(g) for g in REGION_GROUPS if " / ".join(g) == name), [name]),
+                        "teams": len(b["teams"]), "ranked_teams": len(ranked), "events": b["events"],
+                        "matches": b["matches"],
+                        "avg_value": round(sum(d["value"] for d in ranked) / len(ranked), 1) if ranked else None,
+                        "top_teams": [d["team"] for d in top]})
+
+    write_json(os.path.join(out, "teams.json"), wrap(teams=teams))
+    write_json(os.path.join(out, "solo.json"), wrap(solo=solo))
+    write_json(os.path.join(out, "events.json"), wrap(events=ev_list))
+    write_json(os.path.join(out, "regions.json"), wrap(regions=regions))
+
+    # ---- events/{id}.json
+    n_events = 0
+    for eid, rec in ev_index.items():
+        sk = by_event.get(eid, {})
+        jm = world["event_matches"].get(eid, [])
+        reg_teams = world["event_teams"].get(eid)
+        if rec["status"] not in ("ok", "partial") and not (jm or sk or reg_teams):
+            continue
+        derived = {}
+        for m in jm:
+            for s in (m["red"], m["blue"]):
+                for x in s["teams"]:
+                    if x["code"]:
+                        derived.setdefault(x["code"], {"code": x["code"], "name": x["name"], "organization": None,
+                                                       "grade": None, "region": None})
+        stats = [{"team": k, "matches": cnt, "ccwm": round(o - d, 2), "opr": round(o, 2), "dpr": round(d, 2)}
+                 for k, (o, d, cnt) in sorted((ccwm_ev.get(eid) or {}).items())]
+        head = {k: v for k, v in rec.items() if k not in ("matches", "teams")}   # counts live in events.json
+        write_json(os.path.join(out, "events", f"{eid}.json"), wrap(
+            **head, scored_matches=rec["matches"], team_count=rec["teams"], divisions=[{"id": d["id"], "name": d.get("name")} for d in ev_raw[eid].get("divisions") or []],
+            matches=jm,
+            solo=sorted(({"team": k, "name": v["name"], "driver": v["driver"], "programming": v["programming"],
+                          "total": v["driver"] + v["programming"]} for k, v in sk.items()),
+                        key=lambda x: (-x["total"], x["team"])),
+            team_stats=stats, rankings=world["rankings"].get(eid, []),
+            teams=reg_teams if reg_teams else sorted(derived.values(), key=lambda x: x["code"])))
+        n_events += 1
+
+    # ---- teams/{code}.json
+    for d in teams:
+        code = d["team"]
+        per = {}
+        for m in tmatches.get(code, []):
+            e = per.setdefault(m["event_id"], {"matches": 0, "wins": 0, "losses": 0, "ties": 0})
+            if m["scored"]:
+                e["matches"] += 1
+                e["wins" if m["result"] == "W" else "losses" if m["result"] == "L" else "ties"] += 1
+        for eid, tdict in by_event.items():
+            if code in tdict:
+                per.setdefault(eid, {"matches": 0, "wins": 0, "losses": 0, "ties": 0})
+        ev_rows = []
+        for eid, e in per.items():
+            cc, sk, rec = (ccwm_ev.get(eid) or {}).get(code), by_event.get(eid, {}).get(code), ev_index.get(eid, {})
+            ev_rows.append({"event_id": eid, "name": rec.get("name"), "start": rec.get("start"),
+                            "region": rec.get("region"), **e,
+                            "ccwm": round(cc[0] - cc[1], 2) if cc else None, "opr": round(cc[0], 2) if cc else None,
+                            "dpr": round(cc[1], 2) if cc else None, "driver": sk["driver"] if sk else None,
+                            "programming": sk["programming"] if sk else None})
+        ev_rows.sort(key=lambda x: (x["start"] or "", str(x["event_id"])))
+        safe = re.sub(r"[^A-Za-z0-9._-]", "_", code)
+        head = {k: v for k, v in d.items() if k not in ("events", "matches")}   # counts live in teams.json
+        write_json(os.path.join(out, "teams", f"{safe}.json"),
+                   wrap(**head, event_count=d["events"], match_count=d["matches"], events=ev_rows,
+                        matches=tmatches.get(code, []), history=history.get(code, [])))
+
+    # ---- meta.json (written last: it is the "everything above is in place" marker)
+    status = Counter(r["status"] for r in report.values())
+    bad = [(e, r) for e, r in report.items() if r["status"] in ("failed", "partial", "pending")]
+    write_json(os.path.join(out, "meta.json"), wrap(
+        methodVersion=METHOD_VERSION, runId=os.environ.get("GITHUB_RUN_ID") or now,
+        runSeconds=round(time.time() - t_start, 1),
+        counts={"teams": len(teams), "ranked_teams": sum(1 for d in teams if d["ranked"]), "events": len(ev_list),
+                "matches": sum(len(e["matches"]) for e in events)},
+        events_by_status={k: status.get(k, 0) for k in ("ok", "empty", "partial", "failed", "future", "pending", "notfound")},
+        live_events=sum(1 for e in ev_list if e["live"]),
+        incomplete=[{"id": e, "status": r["status"], "detail": r["detail"][:200]} for e, r in bad[:20]],
+        constants={"value_weights": VALUE_WEIGHTS,
+                   "elo": {"base": BASE_RATING, "k_max": K_MAX, "k_min": K_MIN, "k_decay_matches": K_DECAY_MATCHES,
+                           "max_delta": MAX_DELTA, "shrink_n": SHRINK_N, "playoff_weight": PLAYOFF_WEIGHT},
+                   "trueskill": {"mu": TS_MU, "sigma": TS_SIGMA, "beta": TS_BETA, "tau": TS_TAU,
+                                 "draw_probability": TS_DRAW_P},
+                   "curves": {"elo": [ELO_CENTER, ELO_SCALE], "ts": [TS_CENTER, TS_SCALE],
+                              "ccwm": [CCWM_CENTER, CCWM_SCALE], "solo": [SOLO_CENTER, SOLO_SCALE]},
+                   "min_matches_ranked": a.min_matches, "include_playoffs": a.include_playoffs,
+                   "skills_seed": a.skills_seed},
+        source={"api": "degraded" if bad else "ok", "last_event_list_at": None if a.event_ids else now}))
+    return out, len(teams), n_events, len(ev_list)
+
+
 # ----------------------------- synthetic demo -----------------------------
 def _ranks(v):
     order = sorted(range(len(v)), key=lambda i: v[i])
@@ -1178,6 +1577,10 @@ def main():
                     help="matches needed to be ranked (a qualifier has at least 5 per team)")
     ap.add_argument("--region-group", action="append", default=[], metavar="'A / B'",
                     help="treat these regions as one combined region (repeatable). Built in: New Hampshire / Vermont")
+    ap.add_argument("--json-out", help="folder for the JSON files (default: <out>/v1)")
+    ap.add_argument("--no-json", action="store_true", help="write only the CSV files")
+    ap.add_argument("--upcoming-days", type=float, default=30,
+                    help="fetch registered teams for future events starting within this many days")
     ap.add_argument("--demo", action="store_true", help="synthetic data, no network")
     a = ap.parse_args()
     for g in a.region_group:
@@ -1190,6 +1593,7 @@ def main():
         run_demo()
         return
 
+    t_start = time.time()
     events, world, report, client = fetch_all(a)
     os.makedirs(a.out, exist_ok=True)
     with open(os.path.join(a.out, "fetch_report.json"), "w", encoding="utf-8") as f:
@@ -1207,10 +1611,17 @@ def main():
     elo.run(events)
     rows, sizes = elo.results(a.min_matches)
     ts = run_trueskill(events, seeds)
-    add_extras(rows, ts, run_ccwm(events))
+    ccwm_ev = {}
+    add_extras(rows, ts, run_ccwm(events, ccwm_ev))
     add_profile(rows, world["meta"], team_regions_from_matches(events, world["info"]), ws_rows)
     add_value(rows)
     path = write_outputs(rows, a.out)
+    if not a.no_json:
+        history = build_history(events, seeds, world["by_event"], world["info"], ccwm_ev)
+        jdir, n_teams, n_ev_files, n_events = publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev,
+                                                            history, t_start)
+        print(f"JSON: {jdir}  (meta, teams, solo, events, regions + {n_ev_files} event files + {n_teams} team files; "
+              f"{n_events} events listed, rankings {'loaded' if world['rankings_ok'] else 'unavailable'})\n")
     incomplete = sum(1 for r in report.values() if r["status"] in ("failed", "partial", "pending"))
     if incomplete:
         print(f"WARNING: ratings use {len(events)} events; {incomplete} more are incomplete. Re-run to include them.\n")
