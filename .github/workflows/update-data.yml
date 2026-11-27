@@ -308,19 +308,57 @@ jobs:
 
           git commit -m "Update RECF Scout data"
 
-          for attempt in 1 2 3; do
-            git pull --rebase --autostash origin main
+          for attempt in 1 2 3 4 5; do
+            echo "Push attempt $attempt"
 
-            if git push origin main; then
+            # Fetch the latest remote changes.
+            git fetch origin main
+
+            # Rebase our generated data commit onto the latest main.
+            if ! git rebase origin/main; then
+              echo "Rebase conflict detected."
+
+              # Generated output is authoritative for this run.
+              # Resolve conflicting output files in favor of our version.
+              git diff --name-only --diff-filter=U |
+                while IFS= read -r file; do
+                  case "$file" in
+                    out/*)
+                      git checkout --theirs -- "$file"
+                      git add -- "$file"
+                      ;;
+                    *)
+                      echo "Unexpected conflict outside out/: $file"
+                      exit 1
+                      ;;
+                  esac
+                done
+
+              # Stop if conflicts remain.
+              if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
+                echo "Unresolved conflicts remain."
+                git rebase --abort
+                exit 1
+              fi
+
+              git rebase --continue || {
+                echo "Could not continue rebase."
+                git rebase --abort
+                exit 1
+              }
+            fi
+
+            # Push the rebased commit.
+            if git push origin HEAD:main; then
               echo "Successfully pushed data updates."
               exit 0
             fi
 
-            echo "Push attempt $attempt failed."
-            sleep 2
+            echo "Push failed; retrying."
+            sleep 3
           done
 
-          echo "Failed to push after 3 attempts."
+          echo "Failed to push after 5 attempts."
           exit 1
 
       # --------------------------------------------------
