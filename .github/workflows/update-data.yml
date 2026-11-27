@@ -23,6 +23,7 @@ concurrency:
 env:
   CACHE_VERSION: v1
   PYTHONUNBUFFERED: "1"
+  RECF_ARGS: "--out out --cache cache"
 
 jobs:
   update-data:
@@ -124,6 +125,22 @@ jobs:
         run: |
           ARGS="--out out --cache cache"
           python recf_elo.py $ARGS
+          
+      # --------------------------------------------------
+      # 6b. Add Elo change per match to the JSON
+      #
+      # Runs before the cache check so any cache it touches is saved.
+      # Never fails the job: if it is skipped or errors, the site just
+      # shows no per-match Elo change until the next run.
+      # --------------------------------------------------
+
+      - name: Add Elo change per match
+        if: ${{ steps.generate.outcome == 'success' }}
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          RECF_TOKEN: ${{ secrets.RECF_TOKEN }}
+        run: python add_elo_deltas.py --out out --cache cache
 
       # --------------------------------------------------
       # 7. Check whether cache changed
