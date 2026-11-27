@@ -58,11 +58,7 @@ jobs:
           RECF_TOKEN: ${{ secrets.RECF_TOKEN }}
         run: |
           touch "$RUNNER_TEMP/cache-marker"
-          # Stop fetching after 22 minutes so the cache still gets saved and the job is never killed by the
-          # 30-minute limit. The first (cold) run may need several runs to finish; each one continues the last.
-          ARGS="--out out --cache cache --time-budget-min 22"
-          # Once a day (12:15 UTC) refresh v1/meta.json even if nothing changed, so there is always a recent commit.
-          if [ "$(date -u +%H)" = "12" ]; then ARGS="$ARGS --heartbeat"; fi
+          ARGS="--out out --cache cache"
           python recf_elo.py $ARGS
 
       - name: Did the cache change?
