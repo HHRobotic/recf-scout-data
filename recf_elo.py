@@ -413,22 +413,34 @@ PLAYOFF_BREAK_MIN = 20      # assumed pause between the last qualification match
 def estimate_times(jms, event_start):
     """Put every match of ONE event on a timeline. Matches with a scheduled time keep it. The rest (usually the playoff
     rounds) are placed from the competition's own order: within a division by (round, instance, match number), after
-    the matches that come before them. A gap between two timed matches is interpolated; after the last timed match
-    they are counted forward by that division's typical gap between matches (plus a short break when qualification
-    ends); an event with no times at all is laid out from its start date.
+    the matches that come before them.
+      * between two timed matches: interpolated
+      * after the last timed match (the usual playoff case, only one anchor): counted forward by that division's
+        typical gap between matches, plus a short break when qualification ends
+      * a division with no times at all: qualification-style divisions are laid out from the event start; a division
+        that holds only playoff matches (for example a finals division) goes after everything already placed
     Adds scheduled_est and time_estimated to every match; returns {match id: scheduled_est}."""
-    out, divs = {}, {}
+    out, divs, latest = {}, {}, [None]
     for m in jms:
         divs.setdefault(m.get("division"), []).append(m)
     base = parse_iso(event_start) or datetime(2000, 1, 1)
+    plans, all_gaps = [], []
     for ms in divs.values():
         seq = sorted(ms, key=lambda m: (m.get("round") or 0, m.get("instance") or 0, m.get("matchnum") or 0,
                                         m.get("id") or 0))
         times = [parse_iso(m.get("scheduled")) for m in seq]
         known = sorted(x for x in times if x)
         gaps = sorted(b - a for a, b in zip(known, known[1:]) if timedelta(0) < b - a <= timedelta(minutes=30))
-        step = min(max(gaps[len(gaps) // 2] if gaps else timedelta(minutes=7), timedelta(minutes=2)),
-                   timedelta(minutes=15))
+        all_gaps += gaps
+        plans.append((seq, times, gaps))
+
+    def typical(gaps):
+        g = gaps[len(gaps) // 2] if gaps else timedelta(minutes=7)
+        return min(max(g, timedelta(minutes=2)), timedelta(minutes=15))
+
+    event_step = typical(sorted(all_gaps))
+
+    def place(seq, times, step, anchor=None):
         idx_known = [i for i, x in enumerate(times) if x]
         for i, m in enumerate(seq):
             if times[i]:
@@ -445,11 +457,26 @@ def estimate_times(jms, event_start):
                 elif nxt is not None:
                     est = times[nxt] - step * (nxt - i)
                 else:
-                    est = base + step * i
+                    est = (anchor or base) + step * i
                 guessed = True
-            m["scheduled_est"] = est.replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%S")
+            est = est.replace(microsecond=0)
+            if latest[0] is None or est > latest[0]:
+                latest[0] = est
+            m["scheduled_est"] = est.strftime("%Y-%m-%dT%H:%M:%S")
             m["time_estimated"] = guessed
             out[m.get("id")] = m["scheduled_est"]
+
+    for seq, times, gaps in plans:                       # 1. divisions that have at least one timed match
+        if any(times):
+            place(seq, times, typical(gaps) if gaps else event_step)
+    rest = [p for p in plans if not any(p[1])]           # 2. divisions with no times at all
+    for seq, times, gaps in rest:
+        if any((m.get("round") or 0) < 3 for m in seq):
+            place(seq, times, event_step)
+    for seq, times, gaps in rest:
+        if all((m.get("round") or 0) >= 3 for m in seq):
+            place(seq, times, event_step,
+                  latest[0] + timedelta(minutes=PLAYOFF_BREAK_MIN) if latest[0] else None)
     return out
 
 
