@@ -8,6 +8,7 @@ and adds three things to the JSON files recf_elo.py already wrote in out/v1/:
 
     events/<id>.json   every team in every match gets   "elo_delta" and "elo_after"
     teams/<code>.json  every match gets                  "elo_delta", "elo_after", and "deltas" {team: change}
+    teams/<code>.json  gets an "upcoming_events" list: current and upcoming events the team is registered for
 
 The RECF Scouting site shows these as the Elo change next to each match and team, and draws the Elo graph from them.
 If this script is not run, or is skipped by its safety check, the site still works and simply leaves those out.
@@ -20,6 +21,7 @@ Safety check: the replay must reproduce the ratings recf_elo.py just published (
 (different options, or new matches arrived between the two runs) nothing is changed and the script exits normally.
 """
 import argparse, glob, json, os, re, sys
+from datetime import timedelta
 from types import SimpleNamespace
 
 import recf_elo as R
@@ -115,6 +117,33 @@ def patch_teams(v1_dir, lookup):
     return changed
 
 
+def patch_upcoming(v1_dir, now=None):
+    """Adds "upcoming_events" to every team file: events that are live or have not started, where the team is registered.
+    Needs no Elo replay and no API access, only the event files recf_elo.py already wrote. -> number of team files changed"""
+    now = now or R._now()
+    live = []
+    for path in sorted(glob.glob(os.path.join(v1_dir, "events", "*.json"))):
+        ev = read(path)
+        if ev.get("is_test"):
+            continue
+        start = R.parse_iso(ev.get("start"))
+        end = R.parse_iso(ev.get("end")) or start
+        if not start or (end + timedelta(days=1) < now and not ev.get("live")):
+            continue  # already finished
+        codes = {t["code"] for t in ev.get("teams", [])}
+        codes |= {t["code"] for m in ev.get("matches", []) for side in ("red", "blue") for t in m[side]["teams"]}
+        live.append((ev, codes))
+    changed = 0
+    for path in sorted(glob.glob(os.path.join(v1_dir, "teams", "*.json"))):
+        tj = read(path)
+        ups = sorted(({"event_id": ev["id"], "name": ev.get("name"), "start": ev.get("start"), "end": ev.get("end"), "city": ev.get("city"),
+                       "region": ev.get("region"), "live": bool(ev.get("live"))} for ev, codes in live if tj["team"] in codes),
+                     key=lambda e: (e["start"] or "", str(e["event_id"])))
+        tj["upcoming_events"] = ups
+        changed += write_if_changed(path, tj)
+    return changed
+
+
 def run_patch(elo, out_dir):
     v1 = os.path.join(out_dir, "v1")
     if not os.path.exists(os.path.join(v1, "teams.json")):
@@ -150,6 +179,9 @@ def main():
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="replace")
+    v1 = os.path.join(a.out, "v1")
+    if os.path.isdir(os.path.join(v1, "events")):
+        print(f"add_elo_deltas: upcoming events added to {patch_upcoming(v1)} team files", file=sys.stderr)
     events, world, _report, _client = R.fetch_all(default_args(a))
     if not events:
         print("add_elo_deltas: no events with scored matches; nothing to do.", file=sys.stderr)
