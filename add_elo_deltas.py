@@ -158,10 +158,33 @@ def run_patch(elo, out_dir):
 
 def default_args(a):
     """The same defaults as recf_elo.py's command line."""
-    return SimpleNamespace(base=R.API_DEFAULT, token=os.environ.get("RECF_TOKEN"), out=a.out, cache=a.cache, refresh=False, delay=0.6, retries=5,
-                           breaker=3, cooldown=120.0, max_cooldowns=4, recent_days=3, recent_ttl_hours=6, empty_ttl_hours=24, event_ids=a.event_ids,
-                           program_prefix="ACH", program_type_id=2, max_pages=60, include_playoffs=a.include_playoffs, skills_seed=a.skills_seed,
-                           skip_surrogates=a.skip_surrogates, min_matches=5, upcoming_days=30, json_out=None, no_json=False)
+    return SimpleNamespace(
+        base=R.API_DEFAULT,
+        token=os.environ.get("RECF_TOKEN"),
+        out=a.out,
+        cache=a.cache,
+        refresh=False,
+        delay=0.6,
+        retries=5,
+        breaker=3,
+        cooldown=120.0,
+        max_cooldowns=4,
+        recent_days=3,
+        recent_ttl_hours=6,
+        empty_ttl_hours=24,
+        event_ids=a.event_ids,
+        program_prefix="ACH",
+        program_type_id=2,
+        max_pages=60,
+        include_playoffs=a.include_playoffs,
+        skills_seed=a.skills_seed,
+        skip_surrogates=a.skip_surrogates,
+        min_matches=5,
+        upcoming_days=30,
+        time_budget_min=None,
+        json_out=None,
+        no_json=False,
+    )
 
 
 def main():
