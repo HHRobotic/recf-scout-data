@@ -57,7 +57,7 @@ import sys
 import time
 from collections import Counter
 from statistics import NormalDist
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 # ----------------------------- tunables -----------------------------------
 BASE_RATING = 1500.0
@@ -407,6 +407,52 @@ def norm_match(m, include_playoffs, skip_surrogates=False):
             "sur": sur}
 
 
+PLAYOFF_BREAK_MIN = 20      # assumed pause between the last qualification match and the first playoff match
+
+
+def estimate_times(jms, event_start):
+    """Put every match of ONE event on a timeline. Matches with a scheduled time keep it. The rest (usually the playoff
+    rounds) are placed from the competition's own order: within a division by (round, instance, match number), after
+    the matches that come before them. A gap between two timed matches is interpolated; after the last timed match
+    they are counted forward by that division's typical gap between matches (plus a short break when qualification
+    ends); an event with no times at all is laid out from its start date.
+    Adds scheduled_est and time_estimated to every match; returns {match id: scheduled_est}."""
+    out, divs = {}, {}
+    for m in jms:
+        divs.setdefault(m.get("division"), []).append(m)
+    base = parse_iso(event_start) or datetime(2000, 1, 1)
+    for ms in divs.values():
+        seq = sorted(ms, key=lambda m: (m.get("round") or 0, m.get("instance") or 0, m.get("matchnum") or 0,
+                                        m.get("id") or 0))
+        times = [parse_iso(m.get("scheduled")) for m in seq]
+        known = sorted(x for x in times if x)
+        gaps = sorted(b - a for a, b in zip(known, known[1:]) if timedelta(0) < b - a <= timedelta(minutes=30))
+        step = min(max(gaps[len(gaps) // 2] if gaps else timedelta(minutes=7), timedelta(minutes=2)),
+                   timedelta(minutes=15))
+        idx_known = [i for i, x in enumerate(times) if x]
+        for i, m in enumerate(seq):
+            if times[i]:
+                est, guessed = times[i], False
+            else:
+                prev = max((j for j in idx_known if j < i), default=None)
+                nxt = min((j for j in idx_known if j > i), default=None)
+                if prev is not None and nxt is not None and times[nxt] > times[prev]:
+                    est = times[prev] + (times[nxt] - times[prev]) * (i - prev) / (nxt - prev)
+                elif prev is not None:
+                    est = times[prev] + step * (i - prev)
+                    if (seq[prev].get("round") or 0) <= 2 < (m.get("round") or 0):
+                        est += timedelta(minutes=PLAYOFF_BREAK_MIN)
+                elif nxt is not None:
+                    est = times[nxt] - step * (nxt - i)
+                else:
+                    est = base + step * i
+                guessed = True
+            m["scheduled_est"] = est.replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%S")
+            m["time_estimated"] = guessed
+            out[m.get("id")] = m["scheduled_est"]
+    return out
+
+
 def json_match(m, div_id):
     """Every match as published in events/{id}.json (scored or not, any round)."""
     def side(color):
@@ -465,6 +511,11 @@ def load_event(client, eid, a):
                 nm["div"] = d["id"]
                 matches.append(nm)
     res["jmatches"] = jm
+    est = estimate_times(jm, ev.get("start"))
+    for nm in matches:          # replay (and publish) in the competition's real order
+        e = est.get(nm["id"])
+        if e:
+            nm["key"] = (e, nm["key"][1], nm["key"][2], nm["key"][3])
     res["matches"] = len(matches)
     res["detail"] = "; ".join(failed)
     if matches:
@@ -1198,7 +1249,7 @@ def write_outputs(rows, out_dir):
 
 # ----------------------------- history + JSON publishing ------------------
 SCHEMA_VERSION = 1
-METHOD_VERSION = "2026.11.3"          # bump whenever a rating / value constant changes
+METHOD_VERSION = "2026.11.4"          # bump whenever a rating / value constant changes
 TEST_EVENT_PATTERN = re.compile(r"\b(test|tests|testing|demo|sandbox)\b", re.I)
 LIVE_HOURS_AFTER_END = 36
 TEAM_FIELDS = ["team", "name", "organization", "region", "grade", "value", "value_elo", "value_ts", "value_ccwm",
@@ -1285,14 +1336,15 @@ def build_team_matches(world):
                         res = "W" if sf > sa else "L" if sf < sa else "T"
                     out.setdefault(tm["code"], []).append({
                         "event_id": eid, "name": m["name"], "round": m["round"], "instance": m["instance"],
-                        "matchnum": m["matchnum"], "scheduled": m["scheduled"], "field": m["field"], "scored": scored,
+                        "matchnum": m["matchnum"], "scheduled": m["scheduled"], "scheduled_est": m["scheduled_est"],
+                        "time_estimated": m["time_estimated"], "field": m["field"], "scored": scored,
                         "color": color, "partners": [x["code"] for x in side["teams"] if x["code"] != tm["code"]],
                         "opponents": [x["code"] for x in opp["teams"]],
                         "score_for": sf if scored else None, "score_against": sa if scored else None,
                         "result": res, "sitting": tm["sitting"], "elo_before": tm.get("elo_before"),
                         "elo_after": tm.get("elo_after"), "elo_delta": tm.get("elo_delta")})
     for lst in out.values():
-        lst.sort(key=lambda x: (x["scheduled"] or "", str(x["event_id"]), x["round"] or 0, x["matchnum"]))
+        lst.sort(key=lambda x: (x["scheduled_est"], str(x["event_id"]), x["round"] or 0, x["instance"], x["matchnum"]))
     return out
 
 
@@ -1382,7 +1434,9 @@ def publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev, histo
         return {"schemaVersion": SCHEMA_VERSION, "generatedAt": now, **kw}
 
     for eid in list(world["event_matches"]):
-        world["event_matches"][eid] = with_elo(eid, world["event_matches"][eid], elo_log)
+        world["event_matches"][eid] = sorted(
+            with_elo(eid, world["event_matches"][eid], elo_log),
+            key=lambda m: (m["scheduled_est"], m["division"] or 0, m["round"] or 0, m["instance"], m["matchnum"]))
     tmatches = build_team_matches(world)
     by_event, meta = world["by_event"], world["meta"]
 
@@ -1392,7 +1446,7 @@ def publish_json(a, rows, ws_rows, events, world, report, client, ccwm_ev, histo
         d = {k: _null(r.get(k)) for k in TEAM_FIELDS}
         d["team"], d["name"] = r["team"], r["name"]
         d["organization"] = meta.get(r["team"], {}).get("organization")
-        scored = [m["scheduled"] for m in tmatches.get(r["team"], []) if m["scored"] and m["scheduled"]]
+        scored = [m["scheduled_est"] for m in tmatches.get(r["team"], []) if m["scored"]]
         d["last_match_at"] = max(scored) if scored else None
         d["ranked"], d["main_component"] = bool(r["ranked"]), bool(r["main_component"])
         teams.append(d)
